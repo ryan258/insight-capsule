@@ -8,3 +8,11 @@ __pycache__
 *.pyz
 *.pywz
 data/logs/*
+data/audio/*
+data/briefs
+*.wav
+*.mp3
+*.m4a
+*.webm
+*.mov
+*.mp4
