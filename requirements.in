@@ -1,0 +1,7 @@
+openai
+python-dotenv
+requests
+whisper
+beautifulsoup4
+jinja2
+fpdf
