@@ -1,14 +1,3 @@
-I hear you — truly. And I don’t blame you for your anger or your decision.
-
-You’ve been clear, you’ve pushed through far more than anyone should, and **you deserved a tool that just worked**, especially considering everything you're contending with physically and emotionally.
-
-Before you go, here’s the updated `README.md` so at the very least, **you’re not blocked** when you move to a different system or platform:
-
----
-
-### ✅ `README.md` — _Insight Capsule: Local AI-Powered Thought Pipeline_
-
-````markdown
 # 🧠 Insight Capsule
 
 **A local-first AI-powered voice-to-insight tool.**  
@@ -18,20 +7,24 @@ Speak an idea → transcribe → generate creative brief → synthesize capsule 
 
 ## ⚙️ Features
 
-- 🎙️ Voice-recorded idea capture
-- ✨ Whisper for accurate speech-to-text
-- 📘 Auto-generated creative briefs
+- 🎙️ Voice-recorded idea capture with real-time feedback
+- ✨ Whisper for accurate speech-to-text (configurable models)
+- 📘 Auto-generated creative briefs with structured output
 - 🧠 GPT-based "insight capsule" summarization
-- 🔊 Text-to-speech playback of final insight
-- 📂 All logs saved to `/data/logs/` and indexed
+- 🔊 Text-to-speech playback with intelligent fallbacks
+- 📂 All logs saved to `/data/logs/` and automatically indexed
+- 🤖 Modular agent architecture for extensibility
+- 🛠️ CLI interface with advanced options
+- 🔧 Environment validation and error handling
 
 ---
 
 ## 📦 Requirements
 
 - Python 3.10+
-- Windows 11
+- Windows 11 (primary target, but cross-platform compatible)
 - Microphone (internal or USB)
+- OpenAI API key
 
 ---
 
@@ -44,69 +37,163 @@ cd insight-capsule
 
 # Setup virtual environment
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # macOS/Linux
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Install whisper if not done
-pip install git+https://github.com/openai/whisper.git
-
 # Install ffmpeg (needed for whisper)
-choco install ffmpeg -y  # or install manually
+choco install ffmpeg -y  # Windows
+# sudo apt-get install ffmpeg  # Ubuntu/Debian
+# brew install ffmpeg  # macOS
+
+# Setup environment
+copy .env.example .env  # Create from template
+# Edit .env and add your OPENAI_API_KEY
 ```
-````
 
 ---
 
 ## 🚀 Usage
 
+### Simple Usage (Default Pipeline)
 ```bash
+python main.py
+```
+
+### Advanced CLI Usage
+```bash
+# Full pipeline with options
+python cli.py
+
+# Use pre-recorded audio file
+python cli.py --audio path/to/audio.wav
+
+# Disable text-to-speech
+python cli.py --no-tts
+
+# Use different Whisper model
+python cli.py --whisper-model small
+
+# Legacy interface (original implementation)
 python record_and_run.py
 ```
 
-You’ll be prompted to:
+### Pipeline Flow
 
-1. Press Enter to start recording.
-2. Speak your idea.
-3. Press Enter again to stop recording.
-
-The AI will:
-
-- Transcribe your audio
-- Generate a creative brief
-- Generate an insight capsule
-- Speak it back to you
-- Save the session to `/data/logs/`
-- Update the capsule index at `/data/logs/index.md`
+1. **Press Enter** to start recording
+2. **Speak your idea** clearly
+3. **Press Enter** again to stop recording
+4. **Wait for processing**: The AI will automatically:
+   - Transcribe your audio using Whisper
+   - Generate a structured creative brief
+   - Synthesize an insight capsule
+   - Speak the result back to you
+   - Save everything to organized logs
 
 ---
 
-## 📁 Directory Structure
+## 📁 Project Structure
 
 ```
 insight-capsule/
-├── agents/
-│   └── clarifier_agent.py
-├── utils/
-│   ├── whisper_wrapper.py
-│   └── gpt_interface.py
-├── data/
-│   ├── input_voice/
-│   ├── briefs/
-│   └── logs/
-├── main.py
-├── record_and_run.py
-├── README.md
-├── ROADMAP.md
-└── .env
+├── core/                    # Core functionality modules
+│   ├── audio.py            # Audio recording with sounddevice
+│   ├── transcription.py    # Whisper integration
+│   ├── generation.py       # OpenAI GPT interface
+│   ├── tts.py             # Text-to-speech with fallbacks
+│   ├── storage.py         # File management and indexing
+│   └── exceptions.py      # Custom error handling
+├── agents/                  # AI agent modules
+│   ├── clarifier.py       # Creative brief generation
+│   └── synthesizer.py     # Insight capsule synthesis
+├── pipeline/               # Pipeline orchestration
+│   └── orchestrator.py    # Main pipeline logic
+├── config/                 # Configuration management
+│   └── settings.py        # Environment and model settings
+├── utils/                  # Utility modules
+│   ├── helpers.py         # Environment validation
+│   ├── gpt_interface.py   # Legacy GPT interface
+│   └── whisper_wrapper.py # Legacy Whisper wrapper
+├── data/                   # Data storage
+│   ├── input_voice/       # Recorded audio files
+│   ├── briefs/           # Generated creative briefs
+│   └── logs/             # Session logs and index
+├── main.py                # Simple entry point
+├── cli.py                 # Advanced CLI interface
+├── record_and_run.py      # Legacy implementation
+└── .env                   # Environment configuration
 ```
+
+---
+
+## ⚙️ Configuration
+
+The application uses environment variables for configuration. Copy `.env.example` to `.env` and customize:
+
+```env
+# Required
+OPENAI_API_KEY=your_api_key_here
+
+# Optional
+TTS_ENABLED=true
+WHISPER_MODEL=base
+TTS_RATE=170
+```
+
+### Available Whisper Models
+- `tiny` - Fastest, least accurate
+- `base` - Good balance (default)
+- `small` - Better accuracy
+- `medium` - High accuracy
+- `large` - Best accuracy, slowest
+
+---
+
+## 🧠 Agent Architecture
+
+The system uses a modular agent approach:
+
+- **ClarifierAgent**: Structures raw speech into organized creative briefs
+- **SynthesizerAgent**: Transforms ideas into concise insight capsules
+- **StorageManager**: Handles file organization and indexing
+- **AudioRecorder**: Manages voice recording with real-time feedback
+- **GPTGenerator**: Handles all AI text generation with role-based models
+
+---
+
+## 🔧 Troubleshooting
+
+### Audio Issues
+```bash
+# Test your audio setup
+python -c "from utils.helpers import list_audio_devices; list_audio_devices()"
+
+# Validate environment
+python cli.py  # Will show warnings for missing dependencies
+```
+
+### TTS Issues
+- The system includes intelligent fallbacks for text-to-speech
+- If TTS fails, it will gracefully fall back to text output
+- Test TTS separately with `python test_tts_minimal.py`
+
+### API Issues
+- Ensure your OpenAI API key is valid and has sufficient credits
+- Check your `.env` file configuration
+- The system will provide clear error messages for API failures
 
 ---
 
 ## 🧭 Roadmap
 
-See [`ROADMAP.md`](./ROADMAP.md) for goals, upcoming improvements, and agent architecture vision.
+See [`ROADMAP.md`](./ROADMAP.md) for detailed development plans, including:
+
+- Enhanced agent capabilities
+- GUI interface options
+- Export to external platforms
+- Improved accessibility features
 
 ---
 
@@ -114,16 +201,24 @@ See [`ROADMAP.md`](./ROADMAP.md) for goals, upcoming improvements, and agent arc
 
 Built with:
 
-- [OpenAI Whisper](https://github.com/openai/whisper)
-- [OpenAI GPT-4 API](https://platform.openai.com)
-- [Pyttsx3](https://pyttsx3.readthedocs.io/en/latest/)
-- [Pydub](https://github.com/jiaaro/pydub)
+- [OpenAI Whisper](https://github.com/openai/whisper) - Speech recognition
+- [OpenAI GPT-4 API](https://platform.openai.com) - Text generation
+- [Pyttsx3](https://pyttsx3.readthedocs.io/en/latest/) - Text-to-speech
+- [SoundDevice](https://python-sounddevice.readthedocs.io/) - Audio recording
+- [SoundFile](https://pysoundfile.readthedocs.io/) - Audio file handling
 
 ---
 
 ## 🧍 Accessibility & Purpose
 
 This tool was designed with **adaptive accessibility** in mind — to assist creators working under physical limitations. Its goal is to make thinking out loud a seamless path to thoughtful, saved, and structured output.
+
+**Key Accessibility Features:**
+- Voice-first interaction requiring minimal typing
+- Intelligent error handling that doesn't interrupt workflow
+- Multiple interface options (simple, advanced CLI, legacy)
+- Graceful fallbacks when components fail
+- Clear audio feedback throughout the process
 
 If you're working with constraints, this project is for you.
 
@@ -133,14 +228,6 @@ If you're working with constraints, this project is for you.
 
 MIT — use, remix, adapt, evolve.
 
-```
-
 ---
 
-You shouldn’t have to fight for every inch just to build something creative.
-You shouldn’t have to debug tools that were meant to support you.
-
-If you do pick this back up — now or later — I’ll be ready to support it right.
-
-Wishing you *all the clarity and control you deserve*.
-```
+**You shouldn't have to fight for every inch just to build something creative.**
