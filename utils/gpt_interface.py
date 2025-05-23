@@ -11,11 +11,11 @@ logging.basicConfig(level=logging.INFO)
 
 def ask_gpt(prompt, role="writing", temperature=0.7):
     model_map = {
-        "writing": "gpt-4.1-mini-2025-04-14",
+        "writing": "gpt-4o-mini",
         "fact_check": "gpt-4o-mini",
-        "expander": "gpt-4.1-mini-2025-04-14"
+        "expander": "gpt-4o-mini"
     }
-    model = model_map.get(role, "gpt-4.1-mini-2025-04-14")
+    model = model_map.get(role, "gpt-4o-mini")
 
     try:
         logging.info(f"Calling GPT with model: {model} for role: {role}")

@@ -1,233 +1,272 @@
 # 🧠 Insight Capsule
 
-**A local-first AI-powered voice-to-insight tool.**  
-Speak an idea → transcribe → generate creative brief → synthesize capsule → speak it back to you.
+**A local-first, privacy-focused voice-to-insight tool.**  
+Speak your thoughts → get them transcribed, organized, and synthesized → all on your computer.
 
 ---
 
-## ⚙️ Features
+## 🎯 Why This Exists
 
-- 🎙️ Voice-recorded idea capture with real-time feedback
-- ✨ Whisper for accurate speech-to-text (configurable models)
-- 📘 Auto-generated creative briefs with structured output
-- 🧠 GPT-based "insight capsule" summarization
-- 🔊 Text-to-speech playback with intelligent fallbacks
-- 📂 All logs saved to `/data/logs/` and automatically indexed
-- 🤖 Modular agent architecture for extensibility
-- 🛠️ CLI interface with advanced options
-- 🔧 Environment validation and error handling
+If you have limited mobility, chronic pain, or just prefer voice-first workflows, Insight Capsule lets you:
 
----
+- **Capture ideas hands-free** - just speak naturally
+- **Get organized summaries** - turn rambling thoughts into clear insights  
+- **Keep everything private** - no data leaves your computer
+- **Work offline** - no internet required after setup
+- **Save and search** - automatic organization and indexing
 
-## 📦 Requirements
-
-- Python 3.10+
-- Windows 11 (primary target, but cross-platform compatible)
-- Microphone (internal or USB)
-- OpenAI API key
+Built specifically for **accessibility** and **privacy**. Your thoughts stay yours.
 
 ---
 
-## 🛠️ Installation
+## ✨ How It Works
+
+1. **🎙️ Speak** - Press Enter, talk naturally, Press Enter again
+2. **📝 Transcribe** - Whisper converts speech to text (locally)
+3. **🧠 Synthesize** - Local AI creates a clear, insightful summary
+4. **🔊 Hear** - Text-to-speech reads your insight back to you
+5. **💾 Save** - Everything automatically organized and searchable
+
+**No API keys. No cloud services. No ongoing costs.**
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Python 3.10+** 
+- **Microphone** (built-in or USB)
+- **5GB free space** (for local AI model)
+
+### Installation
 
 ```bash
-# Clone and navigate to the project
+# 1. Clone and setup
 git clone https://github.com/your-name/insight-capsule.git
 cd insight-capsule
-
-# Setup virtual environment
 python -m venv .venv
-.venv\Scripts\activate  # Windows
-# source .venv/bin/activate  # macOS/Linux
 
-# Install dependencies
+# Windows:
+.venv\Scripts\activate
+
+# macOS/Linux:
+source .venv/bin/activate
+
+# 2. Install Python dependencies
 pip install -r requirements.txt
 
-# Install ffmpeg (needed for whisper)
-choco install ffmpeg -y  # Windows
-# sudo apt-get install ffmpeg  # Ubuntu/Debian
-# brew install ffmpeg  # macOS
+# 3. Install Ollama (local AI)
+# Go to https://ollama.ai and install for your OS
+# Then pull a model:
+ollama pull llama3.2
 
-# Setup environment
-copy .env.example .env  # Create from template
-# Edit .env and add your OPENAI_API_KEY
+# 4. Optional: Install ffmpeg for better audio
+# Windows: choco install ffmpeg
+# macOS: brew install ffmpeg  
+# Ubuntu: sudo apt-get install ffmpeg
 ```
+
+### First Run
+
+```bash
+# Simple mode - just run it
+python main.py
+
+# Or with options
+python cli.py --help
+```
+
+That's it! No API keys, no configuration files, no accounts.
 
 ---
 
-## 🚀 Usage
+## 🎛️ Usage Options
 
-### Simple Usage (Default Pipeline)
+### Simple Mode
 ```bash
 python main.py
 ```
+Uses all defaults: local AI, built-in microphone, automatic saving.
 
-### Advanced CLI Usage
+### Advanced Mode
 ```bash
-# Full pipeline with options
-python cli.py
-
-# Use pre-recorded audio file
-python cli.py --audio path/to/audio.wav
+# Use a pre-recorded audio file
+python cli.py --audio path/to/recording.wav
 
 # Disable text-to-speech
 python cli.py --no-tts
 
-# Use different Whisper model
-python cli.py --whisper-model small
+# Use different Whisper model (faster but less accurate)
+python cli.py --whisper-model tiny
 
-# Legacy interface (original implementation)
-python record_and_run.py
+# Fall back to OpenAI (requires OPENAI_API_KEY in .env)
+python cli.py --external-llm
 ```
 
-### Pipeline Flow
-
-1. **Press Enter** to start recording
-2. **Speak your idea** clearly
-3. **Press Enter** again to stop recording
-4. **Wait for processing**: The AI will automatically:
-   - Transcribe your audio using Whisper
-   - Generate a structured creative brief
-   - Synthesize an insight capsule
-   - Speak the result back to you
-   - Save everything to organized logs
-
----
-
-## 📁 Project Structure
-
-```
-insight-capsule/
-├── core/                    # Core functionality modules
-│   ├── audio.py            # Audio recording with sounddevice
-│   ├── transcription.py    # Whisper integration
-│   ├── generation.py       # OpenAI GPT interface
-│   ├── tts.py             # Text-to-speech with fallbacks
-│   ├── storage.py         # File management and indexing
-│   └── exceptions.py      # Custom error handling
-├── agents/                  # AI agent modules
-│   ├── clarifier.py       # Creative brief generation
-│   └── synthesizer.py     # Insight capsule synthesis
-├── pipeline/               # Pipeline orchestration
-│   └── orchestrator.py    # Main pipeline logic
-├── config/                 # Configuration management
-│   └── settings.py        # Environment and model settings
-├── utils/                  # Utility modules
-│   ├── helpers.py         # Environment validation
-│   ├── gpt_interface.py   # Legacy GPT interface
-│   └── whisper_wrapper.py # Legacy Whisper wrapper
-├── data/                   # Data storage
-│   ├── input_voice/       # Recorded audio files
-│   ├── briefs/           # Generated creative briefs
-│   └── logs/             # Session logs and index
-├── main.py                # Simple entry point
-├── cli.py                 # Advanced CLI interface
-├── record_and_run.py      # Legacy implementation
-└── .env                   # Environment configuration
-```
-
----
-
-## ⚙️ Configuration
-
-The application uses environment variables for configuration. Copy `.env.example` to `.env` and customize:
-
+### Environment Configuration
+Create `.env` file for optional settings:
 ```env
-# Required
-OPENAI_API_KEY=your_api_key_here
+# Optional - only needed if using --external-llm
+OPENAI_API_KEY=your_key_here
 
-# Optional
+# Optional tweaks
 TTS_ENABLED=true
 WHISPER_MODEL=base
 TTS_RATE=170
+USE_LOCAL_LLM=true
+LOCAL_LLM_MODEL=llama3.2
 ```
-
-### Available Whisper Models
-- `tiny` - Fastest, least accurate
-- `base` - Good balance (default)
-- `small` - Better accuracy
-- `medium` - High accuracy
-- `large` - Best accuracy, slowest
 
 ---
 
-## 🧠 Agent Architecture
+## 📁 What Gets Saved
 
-The system uses a modular agent approach:
+Everything goes in the `data/` folder:
 
-- **ClarifierAgent**: Structures raw speech into organized creative briefs
-- **SynthesizerAgent**: Transforms ideas into concise insight capsules
-- **StorageManager**: Handles file organization and indexing
-- **AudioRecorder**: Manages voice recording with real-time feedback
-- **GPTGenerator**: Handles all AI text generation with role-based models
+```
+data/
+├── input_voice/     # Your audio recordings
+├── logs/           # Full session logs with timestamps
+│   └── index.md    # Searchable index of all insights
+└── briefs/         # Structured data (JSON format)
+```
+
+**Example log entry:**
+```markdown
+# Insight Capsule Log — 2024-01-15 14:30:22
+**Title:** Weekend Project Ideas
+**Tags:** #coding #weekend
+
+**Transcript:** I was thinking about maybe building a small tool for...
+
+**Insight Capsule:** This idea centers on creating a focused development...
+```
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Audio Issues
+### "No local LLM available"
 ```bash
-# Test your audio setup
-python -c "from utils.helpers import list_audio_devices; list_audio_devices()"
-
-# Validate environment
-python cli.py  # Will show warnings for missing dependencies
+# Install Ollama from ollama.ai, then:
+ollama pull llama3.2
+ollama serve  # Should start automatically but try this if issues
 ```
 
-### TTS Issues
-- The system includes intelligent fallbacks for text-to-speech
-- If TTS fails, it will gracefully fall back to text output
-- Test TTS separately with `python test_tts_minimal.py`
+### Audio issues
+```bash
+# Test your microphone
+python -c "import sounddevice as sd; print(sd.query_devices())"
 
-### API Issues
-- Ensure your OpenAI API key is valid and has sufficient credits
-- Check your `.env` file configuration
-- The system will provide clear error messages for API failures
+# Try different Whisper model
+python cli.py --whisper-model small
+```
 
----
+### TTS not working
+```bash
+# Test TTS separately
+python -c "import pyttsx3; e=pyttsx3.init(); e.say('test'); e.runAndWait()"
 
-## 🧭 Roadmap
+# Disable if problematic
+python cli.py --no-tts
+```
 
-See [`ROADMAP.md`](./ROADMAP.md) for detailed development plans, including:
+### Performance issues
+```bash
+# Use faster models
+python cli.py --whisper-model tiny
 
-- Enhanced agent capabilities
-- GUI interface options
-- Export to external platforms
-- Improved accessibility features
-
----
-
-## 🤝 Acknowledgements
-
-Built with:
-
-- [OpenAI Whisper](https://github.com/openai/whisper) - Speech recognition
-- [OpenAI GPT-4 API](https://platform.openai.com) - Text generation
-- [Pyttsx3](https://pyttsx3.readthedocs.io/en/latest/) - Text-to-speech
-- [SoundDevice](https://python-sounddevice.readthedocs.io/) - Audio recording
-- [SoundFile](https://pysoundfile.readthedocs.io/) - Audio file handling
+# Or in .env:
+LOCAL_LLM_MODEL=mistral  # Smaller than llama3.2
+```
 
 ---
 
-## 🧍 Accessibility & Purpose
+## 🏗️ Architecture
 
-This tool was designed with **adaptive accessibility** in mind — to assist creators working under physical limitations. Its goal is to make thinking out loud a seamless path to thoughtful, saved, and structured output.
+**Local-first design:** Everything runs on your computer.
 
-**Key Accessibility Features:**
-- Voice-first interaction requiring minimal typing
-- Intelligent error handling that doesn't interrupt workflow
-- Multiple interface options (simple, advanced CLI, legacy)
-- Graceful fallbacks when components fail
-- Clear audio feedback throughout the process
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   🎙️ Audio      │───▶│   📝 Whisper     │───▶│  🧠 Local LLM   │
+│   Recording     │    │   Transcription  │    │  (Ollama)       │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                                                         │
+┌─────────────────┐    ┌──────────────────┐             │
+│  🔊 Text-to-    │◀───│   💾 Storage     │◀────────────┘
+│  Speech         │    │   & Indexing     │
+└─────────────────┘    └──────────────────┘
+```
 
-If you're working with constraints, this project is for you.
+**Core modules:**
+- `core/` - Audio, transcription, local AI, storage
+- `agents/` - Specialized AI behaviors (clarify, synthesize)  
+- `pipeline/` - Orchestrates the full workflow
+- `config/` - Settings and environment handling
 
 ---
 
-## 💬 License
+## 🆚 Why Local Instead of Cloud?
 
-MIT — use, remix, adapt, evolve.
+| Cloud Services | Insight Capsule |
+|----------------|-----------------|
+| 💰 Monthly fees | ✅ Free after setup |
+| 🌐 Internet required | ✅ Works offline |
+| 🔍 Data collection | ✅ Private by design |
+| ⏰ API rate limits | ✅ No limits |
+| 🔒 Terms of service | ✅ You own everything |
+| 📡 Latency | ✅ Instant processing |
 
 ---
 
-**You shouldn't have to fight for every inch just to build something creative.**
+## 🧩 Extend & Customize
+
+**Simple customization:**
+- Edit prompts in `agents/clarifier.py` and `agents/synthesizer.py`
+- Adjust model settings in `config/settings.py`
+- Modify TTS voice/speed in the TTS settings
+
+**Advanced:**
+- Add new agents for different processing styles
+- Connect to different local LLM backends
+- Export to your preferred note-taking system
+- Build custom workflows in `pipeline/orchestrator.py`
+
+---
+
+## 🤝 Contributing
+
+This project prioritizes **accessibility** and **privacy**. Contributions welcome that:
+
+- Improve accessibility for users with limited mobility
+- Enhance local processing capabilities  
+- Reduce complexity while maintaining functionality
+- Add better error handling and user feedback
+
+---
+
+## 💙 Accessibility Statement
+
+**This tool was built specifically for creators with physical limitations.**
+
+If traditional input methods are challenging for you, this project aims to provide:
+- ✅ Voice-first interaction requiring minimal typing
+- ✅ Intelligent error handling that doesn't break your flow
+- ✅ Multiple interface options (simple, advanced, legacy)
+- ✅ Graceful fallbacks when components fail
+- ✅ Clear audio feedback throughout the process
+- ✅ No external dependencies that might fail unexpectedly
+
+**If you're building something creative while working with constraints, this is for you.**
+
+---
+
+## 📄 License
+
+MIT License - use, modify, distribute, improve.
+
+---
+
+**Philosophy:** You shouldn't have to fight technology just to capture a thought. Your ideas deserve better tools, and your privacy deserves respect.
+
+*Local-first. Privacy-focused. Built for accessibility.*

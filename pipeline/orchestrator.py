@@ -1,3 +1,4 @@
+# pipeline/orchestrator.py (Modified)
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, Any
@@ -5,18 +6,23 @@ import json
 
 from core.audio import AudioRecorder
 from core.transcription import Transcriber
-from core.generation import GPTGenerator
 from core.tts import TextToSpeech
 from core.storage import StorageManager
 from agents.clarifier import ClarifierAgent
 from agents.synthesizer import SynthesizerAgent
 from config.settings import AUDIO_DIR, AUDIO_FILENAME
 
+# Import the new local generator
+from core.local_generation import HybridGenerator
+
 class InsightPipeline:
-    def __init__(self):
+    def __init__(self, use_local: bool = True):
         self.audio_recorder = AudioRecorder()
         self.transcriber = Transcriber()
-        self.generator = GPTGenerator()
+        
+        # NEW: Use HybridGenerator instead of GPTGenerator
+        self.generator = HybridGenerator(prefer_local=use_local)
+        
         self.tts = TextToSpeech()
         self.storage = StorageManager()
         self.clarifier = ClarifierAgent(self.generator)
@@ -68,13 +74,13 @@ class InsightPipeline:
                 self.tts.speak("Transcription complete")
             
             # Step 3: Generate Brief
-            self.tts.speak("Generating creative brief")
+            self.tts.speak("Generating creative brief locally")  # Updated message
             brief = self.clarifier.generate_brief(transcript)
             results["brief"] = brief
             self.tts.speak("Creative brief generated")
             
             # Step 4: Generate Capsule
-            self.tts.speak("Generating insight capsule")
+            self.tts.speak("Generating insight capsule locally")  # Updated message
             capsule = self.synthesizer.generate_capsule(transcript, brief)
             results["capsule"] = capsule
             

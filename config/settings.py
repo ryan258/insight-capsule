@@ -25,11 +25,18 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Model settings
 WHISPER_MODEL = "base"  # tiny, base, small, medium, large
+
+# External LLM settings (OpenAI)
 GPT_MODELS = {
     "writing": "gpt-4o-mini",
-    "fact_check": "gpt-4o-mini",
+    "fact_check": "gpt-4o-mini", 
     "expander": "gpt-4o-mini"
 }
+
+# NEW: Local LLM settings
+USE_LOCAL_LLM = os.getenv("USE_LOCAL_LLM", "true").lower() == "true"
+LOCAL_LLM_URL = os.getenv("LOCAL_LLM_URL", "http://localhost:11434")
+LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "llama3.2")
 
 # TTS settings
 TTS_ENABLED = os.getenv("TTS_ENABLED", "true").lower() == "true"

@@ -1,6 +1,6 @@
-# 🛣️ Insight Capsule — Project Roadmap
+# 🛣️ Insight Capsule — Project Roadmap (UPDATED)
 
-> Purpose: Build a local-first, voice-activated pipeline for generating high-quality, thought artifacts with minimal friction.
+> **New Mission**: Build a truly local-first, voice-activated pipeline for generating thoughtful insights with zero external dependencies and maximum accessibility.
 
 ---
 
@@ -18,10 +18,6 @@
 
 ## ✅ Phase 2: Stabilization & Reliability Pass (COMPLETED)
 
-> We fixed what hurt. Prioritized **resilience**, **feedback**, and **non-blocking failures**.
-
-### 🧰 Fixes & Improvements (COMPLETED)
-
 - [x] ✅ **Replaced edge-tts with working pyttsx3 TTS** with proper cross-platform fallbacks
 - [x] ✅ **Fixed async/sync conflicts** - clean separation of sync operations
 - [x] ✅ **Replaced "print & hang" flows** with graceful error handling and user feedback
@@ -32,23 +28,16 @@
 
 ---
 
-## ✅ Phase 3: Usability Upgrades (MOSTLY COMPLETED)
-
-> Improved the experience, reduced manual fiddling.
+## ✅ Phase 3: Usability Upgrades (COMPLETED)
 
 - [x] ✅ **Added clear progress indicators** between pipeline steps with TTS feedback
 - [x] ✅ **Clean log filenames** with automatic slugification of titles
 - [x] ✅ **Advanced CLI interface** with options for audio files, TTS control, model selection
 - [x] ✅ **Multiple entry points** (simple main.py, advanced cli.py, legacy record_and_run.py)
-- [ ] 🔘 Add startup beep or tone to signal recording started
-- [ ] ⏱️ Add speech duration countdown (text-based)
-- [ ] 🔁 Add retry option after capsule generation (optional)
 
 ---
 
 ## ✅ Phase 4: Modularity & Agent Architecture (COMPLETED)
-
-> Fully modularized system into clear, testable "agent behaviors"
 
 - [x] ✅ **Full modular architecture** with core/, agents/, pipeline/, config/ separation
 - [x] ✅ **Agent: ClarifierAgent** — parse + reframe rough ideas into structured briefs
@@ -58,116 +47,137 @@
 - [x] ✅ **Agent: GPTGenerator** — handle all AI operations with role-based models
 - [x] ✅ **Agent: TextToSpeech** — manage speech output with intelligent fallbacks
 - [x] ✅ **Agent: Transcriber** — handle Whisper integration with lazy loading
-- [x] ✅ **Full agent configuration** via settings.py and environment variables
-- [ ] 🤖 Agent: `fact_checker.py` — optional validation system
-- [ ] 🤖 Agent: `tone_controller.py` — modify emotional tone
 
 ---
 
-## 🔄 Phase 5: Optimization & Polish (IN PROGRESS)
+## 🔄 Phase 5: Local-First Revolution (IN PROGRESS)
 
-> Fine-tune the experience and performance
+> **PRIORITY SHIFT**: Eliminate external dependencies and achieve true offline capability
 
-### 🚀 Performance Improvements
-- [ ] ⚡ **Lazy loading optimization** for Whisper models (partially done)
-- [ ] ⚡ **Concurrent processing** where possible (transcription + brief generation)
-- [ ] ⚡ **Model caching** to reduce startup times
-- [ ] 📊 **Usage analytics** and performance monitoring
-- [ ] 🎯 **Smart model selection** based on input length/complexity
+### 🏠 Local LLM Integration (IN PROGRESS)
+- [x] ✅ **LocalGenerator class** with Ollama integration
+- [x] ✅ **HybridGenerator** for seamless local/external fallback
+- [x] ✅ **Pipeline integration** with local model support
+- [x] ✅ **CLI flags** for choosing local vs external models
+- [ ] 🔧 **Model optimization** for specific insight generation tasks
+- [ ] 🔧 **Local model caching** and startup optimization
+- [ ] 🔧 **Custom prompts** tuned for local models (simpler, more direct)
 
-### 🎨 User Experience
+### 🎯 Workflow Simplification
+- [ ] 🎯 **Streamline agent interactions** - reduce complexity without losing modularity
+- [ ] 🎯 **Remove creative brief step** - go directly from transcript to insight
+- [ ] 🎯 **Focus on core value**: voice → clean transcription → meaningful summary → organized storage
+- [ ] 🎯 **Accessibility testing** with actual users who have mobility constraints
+
+### 🔒 Privacy & Offline
+- [ ] 🔒 **Complete offline mode** validation and testing
+- [ ] 🔒 **Data retention controls** - user decides what gets saved and where
+- [ ] 🔒 **Export capabilities** without external services
+- [ ] 🔒 **Remove all external API dependencies** from default workflow
+
+---
+
+## 🧹 Phase 6: Technical Debt & Cleanup (PLANNED)
+
+> Clean up the codebase and remove legacy complexity
+
+### 🗑️ Legacy Removal
+- [ ] 🗑️ **Remove record_and_run.py** - consolidate to single pipeline approach
+- [ ] 🗑️ **Remove utils/gpt_interface.py** and **utils/whisper_wrapper.py** - superseded by core modules
+- [ ] 🗑️ **Remove agents/clarifier_agent.py** - duplicate of agents/clarifier.py
+- [ ] 🗑️ **Clean up test files** - integrate into proper test suite
+
+### 🧪 Testing & Quality
+- [ ] 🧪 **Comprehensive test suite** for all core functionality
+- [ ] 🧪 **Integration tests** for full pipeline with local models
+- [ ] 🧪 **Performance benchmarking** of local vs external models
+- [ ] 🧪 **Memory usage optimization** for long-running sessions
+
+---
+
+## 🎨 Phase 7: User Experience Refinement (PLANNED)
+
+> Polish the experience for daily use by people with accessibility needs
+
+### 🎙️ Audio Improvements
 - [ ] 🎙️ **Audio level visualization** during recording
-- [ ] ⏸️ **Pause/resume recording** functionality
-- [ ] 🔄 **Edit/retry individual steps** without full pipeline restart
-- [ ] 📝 **Quick note mode** for shorter insights
-- [ ] 🏷️ **Enhanced tagging system** with auto-suggestions
+- [ ] 🎙️ **Configurable recording sensitivity** for different microphone setups
+- [ ] 🎙️ **Background noise filtering** for cleaner transcription
+- [ ] 🎙️ **Multiple audio format support** beyond WAV
+
+### 📝 Output Improvements
+- [ ] 📝 **Configurable insight lengths** (short summaries vs detailed analysis)
+- [ ] 📝 **Multiple output formats** (plain text, markdown, structured notes)
+- [ ] 📝 **Smart tagging system** based on content analysis
+- [ ] 📝 **Search functionality** across historical insights
+
+### ⌨️ Accessibility Features
+- [ ] ⌨️ **Voice commands** for basic control (start, stop, repeat, save)
+- [ ] ⌨️ **Configurable TTS voices** and speeds
+- [ ] ⌨️ **Large text mode** for visual output
+- [ ] ⌨️ **Keyboard shortcut alternatives** for all mouse actions
 
 ---
 
-## 🌍 Phase 6: Export & Distribution (PLANNED)
+## 📦 Phase 8: Distribution & Sharing (FUTURE)
 
-> Share and integrate with existing workflows
+> Make it easy for others to use while maintaining local-first principles
 
-### 📤 Export Capabilities
-- [ ] 📦 **Export as HTML/Markdown** zine-style pages
-- [ ] 📤 **Send to Notion / Obsidian** / Git-based journal
-- [ ] 📧 **Email integration** for sharing insights
-- [ ] 📱 **Mobile-friendly export** formats
-- [ ] 🔗 **URL sharing** for generated insights
+### 🚀 Packaging
+- [ ] 📦 **Simple installer** for non-technical users
+- [ ] 📦 **Docker containerization** for cross-platform consistency
+- [ ] 📦 **Portable executable** version (no Python installation required)
+- [ ] 📦 **Model bundling** options for completely offline distribution
 
-### 🖥️ Interface Options
-- [ ] 🔗 **Simple GUI frontend** (Tkinter or Streamlit-based)
-- [ ] 🌐 **Web dashboard** with session management
-- [ ] ☁️ **HuggingFace Spaces deployment** option
-- [ ] 📱 **Mobile companion app** for voice capture
-
----
-
-## 🧠 Phase 7: Advanced AI Features (FUTURE)
-
-> Enhance the AI capabilities and intelligence
-
-### 🤖 Enhanced Agents
-- [ ] 🧠 **Multi-modal input** (text + voice simultaneously)
-- [ ] 🔍 **Context awareness** across sessions
-- [ ] 📚 **Knowledge base integration** with personal documents
-- [ ] 🎯 **Personalized output styles** based on user preferences
-- [ ] 🔄 **Interactive refinement** of generated content
-
-### 🔬 Advanced Processing
-- [ ] 🧪 **Sentiment analysis** and emotional context
-- [ ] 🔗 **Automatic cross-referencing** with previous insights
-- [ ] 📈 **Trend analysis** across captured thoughts
-- [ ] 🎨 **Creative expansion modes** (poetry, narrative, technical)
+### 🔗 Export & Integration
+- [ ] 🔗 **Export to common note-taking apps** (Obsidian, Notion, Markdown files)
+- [ ] 🔗 **Email integration** for sharing insights
+- [ ] 🔗 **Calendar integration** for scheduled insight sessions
+- [ ] 🔗 **Backup and sync** options that respect privacy
 
 ---
 
-## 🧯 Resolved Pain Points
+## 🎯 Current Priorities (Next 2-4 Weeks)
 
-| Problem                       | Solution Implemented           | Status |
-| ----------------------------- | ------------------------------ | ------ |
-| TTS fails silently            | pyttsx3 with proper error handling + fallbacks | ✅ Fixed |
-| `asyncio.run()` conflict      | Eliminated async mixing, pure sync pipeline | ✅ Fixed |
-| Whisper crashing on CPU       | Lazy loading + configurable models | ✅ Fixed |
-| Long capsule generation hangs | Proper error handling + user feedback | ✅ Fixed |
-| Poor error messages           | Custom exceptions + validation system | ✅ Fixed |
-| Inconsistent file organization| StorageManager with automatic indexing | ✅ Fixed |
-| No progress feedback          | TTS + text feedback throughout pipeline | ✅ Fixed |
+1. **Complete local LLM integration** - ensure Ollama setup is smooth and reliable
+2. **Simplify the workflow** - remove creative brief step, focus on direct insight generation
+3. **Test with real users** - validate the accessibility value proposition
+4. **Clean up codebase** - remove legacy files and consolidate approaches
+5. **Documentation update** - reflect the new local-first architecture
 
 ---
 
-## 🚀 Current Development Priorities
+## 🧯 Updated Pain Points & Solutions
 
-1. **Complete Phase 5 optimizations** - focus on performance and UX polish
-2. **Add fact-checking agent** for optional content validation
-3. **Implement GUI frontend** for users who prefer visual interfaces
-4. **Export system** for integration with existing note-taking workflows
-5. **Enhanced tagging and organization** features
-
----
-
-## 🔚 Final Mission
-
-To enable **voice-first**, hands-free creative workflows  
-for users with **limited physical control**, without reliance on the cloud.
-
-Every word should matter.  
-Every process should serve your **cognitive clarity** — not clutter it.
-
-**Status: The core mission is achieved. Now we optimize and expand.**
+| Old Problem | New Local-First Solution | Status |
+|-------------|-------------------------|--------|
+| OpenAI API costs | Local LLM with Ollama | ✅ Implemented |
+| Internet dependency | Fully offline pipeline | 🔄 In Progress |
+| Privacy concerns | Zero external data sharing | 🔄 In Progress |
+| Complex workflow | Simplified voice→insight→storage | 📋 Planned |
+| Over-engineering | Focus on core accessibility value | 📋 Planned |
 
 ---
 
-## 🏗️ Technical Debt & Maintenance
+## 🎯 Refined Mission Statement
 
-### Code Quality
-- [ ] 🧪 **Comprehensive test suite** for all agents and core functionality
-- [ ] 📖 **API documentation** for all modules
-- [ ] 🔍 **Code coverage analysis** and improvement
-- [ ] 🏗️ **Refactor legacy modules** (gpt_interface.py, whisper_wrapper.py)
+**Enable voice-first, hands-free creative workflows for users with limited physical control, using entirely local processing to ensure privacy, reliability, and zero ongoing costs.**
 
-### Infrastructure
-- [ ] 🐳 **Docker containerization** for easy deployment
-- [ ] 📦 **Package distribution** via PyPI
-- [ ] 🔄 **Automated CI/CD** pipeline
-- [ ] 📋 **Version management** and release process
+**Core Values:**
+- **Local-first**: No internet required after initial setup
+- **Accessibility-focused**: Designed for users with mobility constraints
+- **Privacy-respecting**: Your thoughts stay on your computer
+- **Reliability**: Works when you need it, regardless of external services
+- **Simplicity**: Complex under the hood, simple to use
+
+---
+
+## 🔚 Success Metrics
+
+- [ ] **Zero external API calls** in default operation mode
+- [ ] **Sub-10 second** end-to-end processing time for typical voice notes
+- [ ] **Accessible to non-technical users** with simple installation
+- [ ] **Positive feedback** from users with accessibility needs
+- [ ] **Daily use viability** - stable enough for regular workflow integration
+
+**Status: Pivoting to true local-first architecture. Core mission clarified and focused.**
