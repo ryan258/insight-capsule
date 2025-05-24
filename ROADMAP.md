@@ -40,7 +40,7 @@
 ## ✅ Phase 4: Modularity & Agent Architecture (COMPLETED)
 
 - [x] ✅ **Full modular architecture** with core/, agents/, pipeline/, config/ separation
-- [x] ✅ **Agent: ClarifierAgent** — parse + reframe rough ideas into structured briefs
+- [x] ✅ **Agent: ClarifierAgent** — parse + reframe rough ideas into structured briefs (Now removed due to workflow simplification)
 - [x] ✅ **Agent: SynthesizerAgent** — generate concise insight capsules
 - [x] ✅ **Agent: StorageManager** — handle file organization and indexing
 - [x] ✅ **Agent: AudioRecorder** — manage voice recording with real-time feedback
@@ -55,6 +55,7 @@
 > **PRIORITY SHIFT**: Eliminate external dependencies and achieve true offline capability
 
 ### 🏠 Local LLM Integration (IN PROGRESS)
+
 - [x] ✅ **LocalGenerator class** with Ollama integration
 - [x] ✅ **HybridGenerator** for seamless local/external fallback
 - [x] ✅ **Pipeline integration** with local model support
@@ -63,13 +64,15 @@
 - [ ] 🔧 **Local model caching** and startup optimization
 - [ ] 🔧 **Custom prompts** tuned for local models (simpler, more direct)
 
-### 🎯 Workflow Simplification
-- [ ] 🎯 **Streamline agent interactions** - reduce complexity without losing modularity
-- [ ] 🎯 **Remove creative brief step** - go directly from transcript to insight
-- [ ] 🎯 **Focus on core value**: voice → clean transcription → meaningful summary → organized storage
+### 🎯 Workflow Simplification (IN PROGRESS)
+
+- [x] ✅ **Remove creative brief step** - go directly from transcript to insight
+- [x] ✅ **Focus on core value**: voice → clean transcription → meaningful summary → organized storage (Achieved by removing brief)
+- [ ] 🎯 **Streamline agent interactions** - reduce complexity without losing modularity (Partially addressed by removing ClarifierAgent. Further review might be needed for SynthesizerAgent's directness.)
 - [ ] 🎯 **Accessibility testing** with actual users who have mobility constraints
 
 ### 🔒 Privacy & Offline
+
 - [ ] 🔒 **Complete offline mode** validation and testing
 - [ ] 🔒 **Data retention controls** - user decides what gets saved and where
 - [ ] 🔒 **Export capabilities** without external services
@@ -77,17 +80,19 @@
 
 ---
 
-## 🧹 Phase 6: Technical Debt & Cleanup (PLANNED)
+## 🧹 Phase 6: Technical Debt & Cleanup (IN PROGRESS)
 
 > Clean up the codebase and remove legacy complexity
 
 ### 🗑️ Legacy Removal
-- [ ] 🗑️ **Remove record_and_run.py** - consolidate to single pipeline approach
-- [ ] 🗑️ **Remove utils/gpt_interface.py** and **utils/whisper_wrapper.py** - superseded by core modules
-- [ ] 🗑️ **Remove agents/clarifier_agent.py** - duplicate of agents/clarifier.py
-- [ ] 🗑️ **Clean up test files** - integrate into proper test suite
+
+- [x] 🗑️ **Remove record_and_run.py** - consolidate to single pipeline approach
+- [x] 🗑️ **Remove utils/gpt_interface.py** and **utils/whisper_wrapper.py** - superseded by core modules
+- [x] 🗑️ **Remove agents/clarifier_agent.py** - duplicate of agents/clarifier.py
+- [x] 🗑️ **Clean up test files** - integrate into proper test suite (Initial cleanup: moved to tests/ directory)
 
 ### 🧪 Testing & Quality
+
 - [ ] 🧪 **Comprehensive test suite** for all core functionality
 - [ ] 🧪 **Integration tests** for full pipeline with local models
 - [ ] 🧪 **Performance benchmarking** of local vs external models
@@ -100,18 +105,21 @@
 > Polish the experience for daily use by people with accessibility needs
 
 ### 🎙️ Audio Improvements
+
 - [ ] 🎙️ **Audio level visualization** during recording
 - [ ] 🎙️ **Configurable recording sensitivity** for different microphone setups
 - [ ] 🎙️ **Background noise filtering** for cleaner transcription
 - [ ] 🎙️ **Multiple audio format support** beyond WAV
 
 ### 📝 Output Improvements
+
 - [ ] 📝 **Configurable insight lengths** (short summaries vs detailed analysis)
 - [ ] 📝 **Multiple output formats** (plain text, markdown, structured notes)
 - [ ] 📝 **Smart tagging system** based on content analysis
 - [ ] 📝 **Search functionality** across historical insights
 
 ### ⌨️ Accessibility Features
+
 - [ ] ⌨️ **Voice commands** for basic control (start, stop, repeat, save)
 - [ ] ⌨️ **Configurable TTS voices** and speeds
 - [ ] ⌨️ **Large text mode** for visual output
@@ -124,12 +132,14 @@
 > Make it easy for others to use while maintaining local-first principles
 
 ### 🚀 Packaging
+
 - [ ] 📦 **Simple installer** for non-technical users
 - [ ] 📦 **Docker containerization** for cross-platform consistency
 - [ ] 📦 **Portable executable** version (no Python installation required)
 - [ ] 📦 **Model bundling** options for completely offline distribution
 
 ### 🔗 Export & Integration
+
 - [ ] 🔗 **Export to common note-taking apps** (Obsidian, Notion, Markdown files)
 - [ ] 🔗 **Email integration** for sharing insights
 - [ ] 🔗 **Calendar integration** for scheduled insight sessions
@@ -139,23 +149,22 @@
 
 ## 🎯 Current Priorities (Next 2-4 Weeks)
 
-1. **Complete local LLM integration** - ensure Ollama setup is smooth and reliable
-2. **Simplify the workflow** - remove creative brief step, focus on direct insight generation
-3. **Test with real users** - validate the accessibility value proposition
-4. **Clean up codebase** - remove legacy files and consolidate approaches
-5. **Documentation update** - reflect the new local-first architecture
+1. **Complete local LLM integration** - ensure Ollama setup is smooth and reliable. Focus on model optimization, caching, and custom prompts.
+2. **Continue Workflow Simplification** - Focus on streamlining remaining agent interactions and prepare for accessibility testing.
+3. **Test with real users** - validate the accessibility value proposition (after current simplification).
+4. **Documentation update** - reflect the new local-first architecture and recent changes.
 
 ---
 
 ## 🧯 Updated Pain Points & Solutions
 
-| Old Problem | New Local-First Solution | Status |
-|-------------|-------------------------|--------|
-| OpenAI API costs | Local LLM with Ollama | ✅ Implemented |
-| Internet dependency | Fully offline pipeline | 🔄 In Progress |
-| Privacy concerns | Zero external data sharing | 🔄 In Progress |
-| Complex workflow | Simplified voice→insight→storage | 📋 Planned |
-| Over-engineering | Focus on core accessibility value | 📋 Planned |
+| Old Problem         | New Local-First Solution          | Status                         |
+| ------------------- | --------------------------------- | ------------------------------ |
+| OpenAI API costs    | Local LLM with Ollama             | ✅ Implemented                 |
+| Internet dependency | Fully offline pipeline            | 🔄 In Progress                 |
+| Privacy concerns    | Zero external data sharing        | 🔄 In Progress                 |
+| Complex workflow    | Simplified voice→insight→storage  | ✅ Implemented (brief removed) |
+| Over-engineering    | Focus on core accessibility value | 🔄 In Progress                 |
 
 ---
 
@@ -164,6 +173,7 @@
 **Enable voice-first, hands-free creative workflows for users with limited physical control, using entirely local processing to ensure privacy, reliability, and zero ongoing costs.**
 
 **Core Values:**
+
 - **Local-first**: No internet required after initial setup
 - **Accessibility-focused**: Designed for users with mobility constraints
 - **Privacy-respecting**: Your thoughts stay on your computer
@@ -180,4 +190,4 @@
 - [ ] **Positive feedback** from users with accessibility needs
 - [ ] **Daily use viability** - stable enough for regular workflow integration
 
-**Status: Pivoting to true local-first architecture. Core mission clarified and focused.**
+**Status: Pivoting to true local-first architecture. Core mission clarified and focused. Legacy code cleanup significantly progressed. Workflow simplification (brief removal) completed.**

@@ -23,12 +23,6 @@ def main():
         help="Whisper model size to use"
     )
     parser.add_argument(
-        "--whisper-model",
-        type=str,
-        choices=["tiny", "base", "small", "medium", "large"],
-        help="Whisper model size to use"
-    )
-    parser.add_argument(
         "--external-llm",
         action="store_true",
         help="Use external OpenAI models instead of local LLM"
