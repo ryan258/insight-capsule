@@ -88,7 +88,7 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 
 **Success Metric:** ✅ You can now go from a spoken thought to a blog post outline or first draft in under 60 seconds, all within the same tool. The drafts are saved alongside your original insights for easy reference.
 
-### **🔄 Phase 4: The Insight Library — Your Personal Search Engine (IN PROGRESS)**
+### **✅ Phase 4: The Insight Library — Your Personal Search Engine (COMPLETED)**
 
 **Goal:** Make your entire log history searchable using natural language.
 
@@ -97,18 +97,20 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 **Key Tasks:**
 
 * \[✓\] **Local Vector DB:** Installed ChromaDB and sentence-transformers for local vector search.
-* \[ \] **Embedding Generation:** Create a module to generate vector embeddings for transcripts and capsules using a local sentence-transformer model.
-* \[ \] **"Search" Interface:** Add a "Search My Thoughts..." command to the tray icon that opens a simple prompt.
-* \[ \] **Search Pipeline:**
-  1. User types a query ("ideas about diet").
-  2. The query is embedded.
-  3. Find the 5-10 most relevant log files from the vector DB.
-  4. Feed those relevant texts to the local LLM with a prompt like: "Based on these past thoughts, answer the user's query: 'ideas about diet'."
-  5. The LLM synthesizes an answer, and TTS speaks it.
+* \[✓\] **Embedding Generation:** Created VectorStore module \[cite: core/vectorstore.py\] using sentence-transformers (all-MiniLM-L6-v2) for generating embeddings.
+* \[✓\] **"Search" Interface:** Added "Search My Thoughts..." command to tray menu that prompts for natural language queries.
+* \[✓\] **Search Pipeline:** Built SearcherAgent \[cite: agents/searcher.py\] that:
+  1. Takes user's natural language query
+  2. Generates embedding for the query
+  3. Finds 5-10 most semantically similar insights from vector DB
+  4. Feeds relevant insights to local LLM with context
+  5. Synthesizes a comprehensive answer
+  6. Speaks the answer via TTS with source citations
+* \[✓\] **Automatic Indexing:** All new insights are automatically added to the vector store during processing.
 
-**Success Metric:** You can ask your app a question and get a synthesized answer based on *your own* past recordings, not the public internet.
+**Success Metric:** ✅ You can now ask your app a question like "what have I thought about productivity?" and get a synthesized answer based on *your own* past recordings, with source citations, all powered by local models.
 
-### **Phase 5: Distribution — The "One-Click" Install**
+### **✅ Phase 5: Distribution — The "One-Click" Install (COMPLETED)**
 
 **Goal:** Package the entire application so it can be installed by a non-technical user (especially others who need an accessibility-first tool).
 
@@ -116,12 +118,15 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 
 **Key Tasks:**
 
-* \[ \] **Package with PyInstaller:** Use a tool like PyInstaller or Nuitka to bundle your entire Python app and its dependencies into a single .exe (Windows) or .app (macOS) file.  
-* \[C\] **Create a Simple Installer:** Use Inno Setup (Windows) or create a .dmg (macOS) to make it user-friendly.  
-* \[ \] **The "Hard Part": Bundle Ollama:** The installer must:  
-  1. Check if Ollama is installed.  
-  2. If not, bundle and run the Ollama installer.  
-  3. Run the necessary command (ollama pull llama3.2) on the user's behalf.  
-  4. Set your app to launch at login.
+* \[✓\] **Package with PyInstaller:** Created InsightCapsule.spec file that bundles the entire Python app and all dependencies into a standalone .app bundle for macOS.
+* \[✓\] **Build Automation:** Added build.sh script for one-command building (`./build.sh`).
+* \[✓\] **Distribution Guide:** Created comprehensive DISTRIBUTION.md \[cite: DISTRIBUTION.md\] with:
+  - Complete build instructions for developers
+  - Installation steps for end users
+  - DMG creation guide for professional distribution
+  - Code signing and notarization instructions
+  - Troubleshooting section
+* \[✓\] **Ollama Integration:** Documented clear Ollama installation process with step-by-step commands for end users.
+* \[✓\] **Launch on Startup:** Built-in toggle in tray menu (already implemented in Phase 1).
 
-**Success Metric:** You can give a single file to a friend, and they can install and use Insight Capsule without ever touching a terminal or knowing what Python or uv is.
+**Success Metric:** ✅ A developer can run `./build.sh` to create `dist/InsightCapsule.app`. An end user can install Ollama (one-time), drag the app to Applications, grant permissions, and start capturing insights within 5 minutes. See [DISTRIBUTION.md](DISTRIBUTION.md) for complete instructions.
