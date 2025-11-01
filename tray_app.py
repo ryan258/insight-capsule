@@ -17,6 +17,7 @@ from config.settings import LOGS_DIR
 from core.logger import setup_logger
 from utils.startup import StartupManager
 from agents.drafter import DrafterAgent
+from agents.searcher import SearcherAgent
 from core.local_generation import HybridGenerator
 
 logger = setup_logger(__name__)
@@ -26,11 +27,20 @@ class InsightCapsuleTrayApp:
     """System tray application for Insight Capsule."""
 
     def __init__(self):
-        self.pipeline = InsightPipeline(use_local=True)
+        self.pipeline = InsightPipeline(use_local=True, enable_vector_search=True)
         self.startup_manager = StartupManager("InsightCapsule")
 
         # Create drafter agent using the same generator as the pipeline
         self.drafter = DrafterAgent(self.pipeline.generator)
+
+        # Create searcher agent if vector store is available
+        self.searcher = None
+        if self.pipeline.vector_store:
+            self.searcher = SearcherAgent(
+                vector_store=self.pipeline.vector_store,
+                generator=self.pipeline.generator
+            )
+            logger.info("Searcher agent initialized")
 
         self.icon = None
 
@@ -375,6 +385,59 @@ class InsightCapsuleTrayApp:
         except Exception as e:
             logger.error(f"Failed to append to log: {e}")
 
+    def _search_thoughts(self, icon, item):
+        """Menu action: Search through past insights."""
+        if not self.searcher:
+            logger.warning("Search not available: vector store not initialized")
+            self.tts.speak("Search is not available")
+            return
+
+        try:
+            # Get stats
+            stats = self.searcher.get_stats()
+            total = stats.get("total_insights", 0)
+
+            if total == 0:
+                logger.info("No insights in library yet")
+                self.tts.speak("You don't have any insights in your library yet")
+                return
+
+            # Prompt user for query (via console since we don't have a GUI dialog)
+            print("\n" + "="*60)
+            print("🔍 SEARCH YOUR INSIGHTS")
+            print(f"You have {total} insights in your library")
+            print("="*60)
+            query = input("Enter your search query (or press Enter to cancel): ").strip()
+
+            if not query:
+                logger.info("Search cancelled by user")
+                return
+
+            logger.info(f"Searching for: {query}")
+            self.tts.speak(f"Searching for {query}")
+
+            # Perform search and synthesize answer
+            answer = self.searcher.synthesize_answer(query, n_results=5)
+
+            # Display answer
+            print("\n" + "-"*60)
+            print("ANSWER:")
+            print("-"*60)
+            print(answer)
+            print("-"*60 + "\n")
+
+            # Speak answer
+            self.tts.speak("Here is what I found")
+            # For TTS, read just the main answer without sources
+            main_answer = answer.split("\n\nSources:")[0]
+            self.tts.speak(main_answer)
+
+            logger.info("Search completed successfully")
+
+        except Exception as e:
+            logger.error(f"Search error: {e}", exc_info=True)
+            self.tts.speak("An error occurred during search")
+
     def _quit_app(self, icon, item):
         """Menu action: Quit application."""
         logger.info("Quitting Insight Capsule tray app")
@@ -398,6 +461,12 @@ class InsightCapsuleTrayApp:
                 'Stop Recording',
                 self._stop_recording,
                 enabled=lambda item: self.pipeline.is_recording
+            ),
+            pystray.Menu.SEPARATOR,
+            Item(
+                'Search My Thoughts...',
+                self._search_thoughts,
+                enabled=lambda item: self.searcher is not None
             ),
             pystray.Menu.SEPARATOR,
             Item(

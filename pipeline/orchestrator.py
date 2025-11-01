@@ -13,6 +13,7 @@ from core.storage import StorageManager
 from agents.synthesizer import SynthesizerAgent
 from config.settings import AUDIO_DIR, AUDIO_FILENAME
 from core.logger import setup_logger
+from core.vectorstore import VectorStore
 
 from core.local_generation import HybridGenerator
 
@@ -24,7 +25,7 @@ class InsightPipeline:
     Long-running service for capturing and processing voice insights.
     Can be triggered on-demand and run in the background.
     """
-    def __init__(self, use_local: bool = True): # use_local can still determine HybridGenerator preference
+    def __init__(self, use_local: bool = True, enable_vector_search: bool = True):
         self.audio_recorder = AudioRecorder()
         self.transcriber = Transcriber()
 
@@ -34,6 +35,16 @@ class InsightPipeline:
         self.storage = StorageManager()
         # self.clarifier = ClarifierAgent(self.generator) # Removed
         self.synthesizer = SynthesizerAgent(self.generator) # Synthesizer uses the same generator
+
+        # Initialize vector store for semantic search
+        self.vector_store = None
+        if enable_vector_search:
+            try:
+                self.vector_store = VectorStore()
+                logger.info("Vector store initialized successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize vector store: {e}")
+                logger.warning("Continuing without vector search capability")
 
         # State management for long-running service
         self._is_recording = False
@@ -312,6 +323,30 @@ class InsightPipeline:
                 timestamp=timestamp
             )
             results["log_path"] = str(log_path)
+
+            # Step 5: Add to vector store for semantic search
+            if self.vector_store and capsule:
+                try:
+                    # Generate unique ID from timestamp and title
+                    insight_id = f"{timestamp.strftime('%Y%m%d_%H%M%S')}_{log_title.replace(' ', '_')[:20]}"
+
+                    metadata = {
+                        "title": log_title,
+                        "tags": ",".join(tags) if tags else "",
+                        "timestamp": timestamp.isoformat(),
+                        "log_path": str(log_path)
+                    }
+
+                    self.vector_store.add_insight(
+                        insight_id=insight_id,
+                        transcript=transcript,
+                        capsule=capsule,
+                        metadata=metadata
+                    )
+                    logger.info(f"Added insight to vector store: {insight_id}")
+                except Exception as e:
+                    logger.error(f"Failed to add insight to vector store: {e}")
+                    # Don't fail the whole pipeline if vector indexing fails
 
             # Step 5: Speak result
             self.tts.speak("Here is your insight capsule")

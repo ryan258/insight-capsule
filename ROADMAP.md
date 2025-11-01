@@ -30,7 +30,7 @@ The base is now solid, tested, and production-ready. The interactive manual test
 
 With a stable, local-first foundation, we can now focus on the "ideal" user experience, moving from a CLI tool to a true "thought partner."
 
-### **Phase 1: The "App-ification" — From CLI to Tray**
+### **✅ Phase 1: The "App-ification" — From CLI to Tray (COMPLETED)**
 
 **Goal:** Move the tool from a script you *run* to an application that's *always available* in your system tray (menu bar on Mac, tray on Windows). This is the foundation for all future "ambient" features.
 
@@ -38,18 +38,19 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 
 **Key Tasks:**
 
-* \[ \] **Refactor InsightPipeline:** Turn the orchestrator \[cite: pipeline/orchestrator.py\] into a long-running service or class that can be triggered on demand.  
-* \[ \] **Build Tray Icon:** Use a library like pystray (cross-platform) to create a persistent icon in the system tray.  
-* \[ \] **Add Basic Controls:** The tray icon's menu should have, at minimum:  
-  * "Start Recording" (triggers the audio recording \[cite: core/audio.py\])  
-  * "Stop Recording"  
-  * "Open Logs Folder" (opens the data/logs directory \[cite: core/storage.py\])  
-  * "Quit"  
-* \[ \] **Launch on Startup:** Add a preference (and code) to make the app launch when the computer starts.
+* \[✓\] **Refactor InsightPipeline:** Turned the orchestrator \[cite: pipeline/orchestrator.py\] into a long-running service with state management, threading, and callbacks.
+* \[✓\] **Build Tray Icon:** Created tray_app.py using pystray with dynamic color-coded icon (blue=ready, red=recording, orange=processing, green=complete).
+* \[✓\] **Add Basic Controls:** The tray icon's menu includes:
+  * "Start Recording" (enabled when not busy)
+  * "Stop Recording" (enabled when recording)
+  * "Open Logs Folder" (opens the data/logs directory)
+  * "Launch on Startup" (toggle checkbox)
+  * "Quit"
+* \[✓\] **Launch on Startup:** Implemented cross-platform startup manager \[cite: utils/startup.py\] supporting macOS (LaunchAgent), Windows (Registry), and Linux (.desktop files).
 
-**Success Metric:** You can capture a full insight (record, transcribe, synthesize, save) without ever opening a terminal.
+**Success Metric:** ✅ You can now capture a full insight (record, transcribe, synthesize, save) without ever opening a terminal. The app runs persistently in your system tray.
 
-### **Phase 2: Frictionless Capture — The Global Hotkey**
+### **✅ Phase 2: Frictionless Capture — The Global Hotkey (COMPLETED)**
 
 **Goal:** Implement a global hotkey (e.g., Ctrl+Shift+Space) to start/stop recording from *any* application.
 
@@ -57,14 +58,14 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 
 **Key Tasks:**
 
-* \[ \] **Implement Hotkey Listener:** Use a library like keyboard or pynput to listen for a global hotkey combination.  
-* \[ \] **Connect Hotkey to Pipeline:** Wire the hotkey to the "Start/Stop Recording" function from Phase 1\.  
-* \[ \] **Refine Audio Feedback:** Ensure the TTS feedback ("Recording started," "Processing...") \[cite: core/tts.py\] is crisp and immediate, as you won't have visual confirmation from a terminal.  
-* \[ \] **(Optional) Silence Detection:** Upgrade the audio recorder to *optionally* stop recording automatically after 5-10 seconds of silence.
+* \[✓\] **Implement Hotkey Listener:** Integrated pynput to listen for Ctrl+Shift+Space globally across all applications.
+* \[✓\] **Connect Hotkey to Pipeline:** Wired the hotkey to toggle recording (start if idle, stop if recording) via InsightPipeline's async methods.
+* \[✓\] **Refine Audio Feedback:** TTS feedback ("Recording started," "Processing...") provides immediate audio confirmation without visual terminal output.
+* \[✓\] **Silence Detection:** Added optional auto-stop after configurable silence duration (default 3s) \[cite: config/settings.py, core/audio.py\]. Enable via `SILENCE_DETECTION_ENABLED=true`.
 
-**Success Metric:** You can be typing an email, have a thought, press the hotkey, speak your mind, press it again, and continue your email, knowing the idea is captured.
+**Success Metric:** ✅ You can now be typing an email, have a thought, press Ctrl+Shift+Space, speak your mind, press it again (or wait for silence detection), and continue your email, knowing the idea is captured and being processed.
 
-### **Phase 3: The "Closed Loop" — From Insight to Draft**
+### **✅ Phase 3: The "Closed Loop" — From Insight to Draft (COMPLETED)**
 
 **Goal:** Connect your captured insights directly to your primary content creation workflow for ryanleej.com.
 
@@ -72,19 +73,22 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 
 **Key Tasks:**
 
-* \[ \] **Create a "Drafting" Agent:** Build a new function (similar to your Synthesizer \[cite: agents/synthesizer.py\]) that uses the local LLM.  
-* \[ \] **Define New Prompts:** This agent will take a *capsule* as input and follow a new prompt, such as:  
-  * "You are a content strategist. Turn the following insight into a 5-point blog post outline."  
-  * "Create a 'first draft' of 3 paragraphs based on this idea, intended for an evergreen guide."  
-* \[ \] **Add "Actions" Menu:** Add a new "Actions" submenu to your tray icon. When you complete an insight, it could ask:  
-  * "What's next?"  
-    * "Draft Blog Outline"  
-    * "Export to Markdown"  
-* \[ \] **Improve Log Format:** Save these new drafts alongside the original transcript and capsule in the log file \[cite: core/storage.py\].
+* \[✓\] **Create a "Drafting" Agent:** Built DrafterAgent \[cite: agents/drafter.py\] with methods for generating blog outlines, first drafts, key takeaways, and section expansions.
+* \[✓\] **Define New Prompts:** Created specialized prompts for:
+  * `generate_blog_outline()` - Produces 5-point structured blog outlines
+  * `generate_first_draft()` - Creates ~500 word first drafts for evergreen guides
+  * `generate_key_takeaways()` - Extracts 3 actionable takeaways
+  * `expand_section()` - Develops specific sections in detail
+* \[✓\] **Add "Actions" Menu:** Added "Actions" submenu to tray icon with:
+  * "Generate Blog Outline" (creates structured outline)
+  * "Generate First Draft" (writes full draft)
+  * "Generate Key Takeaways" (extracts main points)
+  * All actions enabled when a recent insight exists
+* \[✓\] **Improve Log Format:** All drafts are automatically appended to the original log file with clear section headers, keeping everything together.
 
-**Success Metric:** You can go from a spoken thought to a blog post outline in under 60 seconds, all within the same tool.
+**Success Metric:** ✅ You can now go from a spoken thought to a blog post outline or first draft in under 60 seconds, all within the same tool. The drafts are saved alongside your original insights for easy reference.
 
-### **Phase 4: The Insight Library — Your Personal Search Engine**
+### **🔄 Phase 4: The Insight Library — Your Personal Search Engine (IN PROGRESS)**
 
 **Goal:** Make your entire log history searchable using natural language.
 
@@ -92,15 +96,15 @@ With a stable, local-first foundation, we can now focus on the "ideal" user expe
 
 **Key Tasks:**
 
-* \[ \] **Local Vector DB:** Integrate a simple, file-based vector database (like LanceDB or ChromaDB).  
-* \[ \] **Embedding Generation:** When a new log is saved, create a background task that generates vector embeddings (using a local model) for the transcript and capsule.  
-* \[ \] **"Search" Interface:** Add a "Search My Thoughts..." command to the tray icon that opens a simple prompt.  
-* \[ \] **Search Pipeline:**  
-  1. User types a query ("ideas about diet").  
-  2. The query is embedded.  
-  3. You find the 5-10 most relevant log files from your vector DB.  
-  4. You feed those relevant texts to your local LLM with a prompt like: "Based on these past thoughts, answer the user's query: 'ideas about diet'."  
-  5. The LLM synthesizes an answer, and your TTS speaks it.
+* \[✓\] **Local Vector DB:** Installed ChromaDB and sentence-transformers for local vector search.
+* \[ \] **Embedding Generation:** Create a module to generate vector embeddings for transcripts and capsules using a local sentence-transformer model.
+* \[ \] **"Search" Interface:** Add a "Search My Thoughts..." command to the tray icon that opens a simple prompt.
+* \[ \] **Search Pipeline:**
+  1. User types a query ("ideas about diet").
+  2. The query is embedded.
+  3. Find the 5-10 most relevant log files from the vector DB.
+  4. Feed those relevant texts to the local LLM with a prompt like: "Based on these past thoughts, answer the user's query: 'ideas about diet'."
+  5. The LLM synthesizes an answer, and TTS speaks it.
 
 **Success Metric:** You can ask your app a question and get a synthesized answer based on *your own* past recordings, not the public internet.
 

@@ -36,9 +36,19 @@ This project is moving from a command-line tool to a zero-friction, ambient appl
 
 ## **🚀 Project Status & Roadmap**
 
-**Current Version: 0.2.0 - Hardened Base** ✅
+**Current Version: 0.3.0 - Tray Application** ✅
 
-This project has a **solid, tested, production-ready foundation** and is ready for feature development.
+This project now features a **persistent system tray application** with global hotkey support and content drafting capabilities.
+
+### **✅ COMPLETED: System Tray Application (v0.3.0)**
+
+* **System Tray App** - Persistent tray icon with dynamic color-coded states (blue/red/orange/green)
+* **Global Hotkey** - Press Ctrl+Shift+Space from anywhere to toggle recording
+* **Content Drafting** - Generate blog outlines, first drafts, and key takeaways from insights
+* **Launch on Startup** - Cross-platform auto-start support (macOS, Windows, Linux)
+* **Silence Detection** - Optional auto-stop after configurable silence duration
+* **Non-blocking Recording** - Thread-safe background recording and processing
+* **Actions Menu** - Post-capture actions: Draft Blog Outline, Generate First Draft, Extract Takeaways
 
 ### **✅ COMPLETED: Hardened Foundation (v0.2.0)**
 
@@ -57,10 +67,10 @@ See [BASE_HARDENING_SUMMARY.md](BASE_HARDENING_SUMMARY.md) for complete technica
 
 See our full [**ROADMAP.md**](ROADMAP.md) for detailed implementation plans:
 
-* **Phase 1: Tray App** - Moving from a CLI to an always-on system tray application
-* **Phase 2: Global Hotkey** - For true, frictionless "ambient" capture (e.g., Ctrl+Shift+Space)
-* **Phase 3: Content Drafting** - The "closed loop" for turning ideas into blog post outlines
-* **Phase 4: Personal Search** - Natural language search across all your past insights
+* **✅ Phase 1: Tray App** - COMPLETED - System tray application with persistent menu controls
+* **✅ Phase 2: Global Hotkey** - COMPLETED - Ctrl+Shift+Space for ambient capture
+* **✅ Phase 3: Content Drafting** - COMPLETED - Turn ideas into blog post outlines and drafts
+* **🔄 Phase 4: Personal Search** - IN PROGRESS - Natural language search across past insights
 * **Phase 5: One-Click Install** - A distributable app for non-technical users
 
 ## **🛠️ Quick Start**
@@ -104,6 +114,37 @@ uv run python -c "from utils.helpers import validate_environment; print(validate
 ```
 
 ### **Running the Application**
+
+#### **System Tray Application (Recommended)**
+
+```bash
+# Start the persistent tray application
+uv run python tray_app.py
+
+# The app will:
+# - Add an icon to your system tray/menu bar
+# - Listen for Ctrl+Shift+Space hotkey
+# - Stay running in the background
+# - Automatically process recordings when you stop
+```
+
+**Tray Icon Colors:**
+- 🔵 **Blue** - Ready (idle)
+- 🔴 **Red** - Recording
+- 🟠 **Orange** - Processing
+- 🟢 **Green** - Complete (briefly)
+
+**Menu Options:**
+- **Start Recording** - Begin capturing audio
+- **Stop Recording** - Stop and process current recording
+- **Actions** → Generate blog outline, first draft, or key takeaways
+- **Open Logs Folder** - View your saved insights
+- **Launch on Startup** - Toggle auto-start
+- **Quit** - Exit the application
+
+**Global Hotkey:** Press **Ctrl+Shift+Space** from any application to toggle recording on/off.
+
+#### **Command Line Interface (Alternative)**
 
 ```bash
 # Basic usage - voice to insight pipeline
