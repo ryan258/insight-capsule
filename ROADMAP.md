@@ -20,9 +20,11 @@ We have successfully built the core foundation of the application, proving the c
   * Successfully pivoted the project to be **local-first**. This involved:  
     * Building the LocalGenerator and HybridGenerator to use Ollama \[cite: core/local\_generation.py\].  
     * Removing the dependency on external (OpenAI) APIs for the default workflow.  
-    * **Simplifying the pipeline** by removing the "creative brief" step, moving to a direct transcript \-\> insight workflow \[cite: pipeline/orchestrator.py\].  
+    * **Simplifying the pipeline** by removing the "creative brief" step, moving to a direct transcript \-\> insight workflow \[cite: pipeline/orchestrator.py\].   
 * **Phase 6: Technical Debt & Cleanup (COMPLETED)**  
   * Removed legacy scripts and consolidated the project to a single, clean pipeline, making it ready for future development.
+
+The base is now solid, tested, and production-ready. The interactive manual tests (test_tts_minimal.py, test_tts.py) are still there for manual TTS testing when needed, but they won't interfere with automated testing anymore.
 
 ## **🚀 The Path Forward (The "Happy Path" Plan)**
 

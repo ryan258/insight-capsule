@@ -3,16 +3,28 @@ import requests
 import json
 from typing import Optional, Literal
 from core.exceptions import GPTGenerationError
+from core.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 RoleType = Literal["writing", "fact_check", "expander"]
 
+
 class LocalGenerator:
     """Local LLM generator using Ollama or other local inference."""
-    
+
     def __init__(self, base_url: str = "http://localhost:11434", model: str = "llama3.2"):
+        """
+        Initialize local LLM generator.
+
+        Args:
+            base_url: Ollama API base URL
+            model: Model name to use (e.g., llama3.2)
+        """
         self.base_url = base_url
         self.model = model
         self.session = requests.Session()
+        logger.info(f"LocalGenerator initialized: {base_url}, model={model}")
         
     def generate(self, 
                  prompt: str, 
@@ -41,15 +53,22 @@ class LocalGenerator:
         
         for attempt in range(max_retries + 1):
             try:
+                logger.info(f"Generating with {self.model} (attempt {attempt + 1}/{max_retries + 1})")
                 print(f"[Local LLM] Generating with {self.model} (attempt {attempt + 1})")
-                
+
                 response = self._call_ollama(prompt, system_prompt, temperature)
+                logger.info(
+                    f"Generation successful: {len(response)} characters, {len(response.split())} words"
+                )
                 return response.strip()
-                
+
             except Exception as e:
+                logger.warning(f"Generation attempt {attempt + 1} failed: {e}")
                 print(f"[Local LLM Error] Attempt {attempt + 1} failed: {e}")
                 if attempt == max_retries:
-                    raise GPTGenerationError(f"Local LLM failed after {max_retries + 1} attempts: {str(e)}")
+                    error_msg = f"Local LLM failed after {max_retries + 1} attempts: {str(e)}"
+                    logger.error(error_msg)
+                    raise GPTGenerationError(error_msg)
     
     def _call_ollama(self, prompt: str, system_prompt: str, temperature: float) -> str:
         """Call Ollama API directly."""
@@ -83,46 +102,81 @@ class LocalGenerator:
         """Check if the local LLM service is available."""
         try:
             response = self.session.get(f"{self.base_url}/api/tags", timeout=5)
-            return response.status_code == 200
-        except:
+            is_up = response.status_code == 200
+            logger.debug(f"Ollama availability check: {is_up}")
+            return is_up
+        except Exception as e:
+            logger.debug(f"Ollama not available: {e}")
             return False
+
 
 class HybridGenerator:
     """Generator that can switch between local and external models."""
-    
+
     def __init__(self, prefer_local: bool = True):
+        """
+        Initialize hybrid generator with local and/or external model support.
+
+        Args:
+            prefer_local: Whether to prefer local LLM over external
+        """
         self.prefer_local = prefer_local
         self.local_generator = None
         self.external_generator = None
-        
+        logger.info(f"Initializing HybridGenerator (prefer_local={prefer_local})")
+
         # Try to initialize local generator
         try:
             self.local_generator = LocalGenerator()
             if not self.local_generator.is_available():
+                logger.warning("Local LLM not available, will fall back to external")
                 print("[Hybrid] Local LLM not available, will fall back to external")
                 self.local_generator = None
+            else:
+                logger.info("Local LLM initialized and available")
         except Exception as e:
+            logger.error(f"Could not initialize local generator: {e}")
             print(f"[Hybrid] Could not initialize local generator: {e}")
-        
+
         # Initialize external generator if needed
         if not self.local_generator or not self.prefer_local:
             try:
                 from core.generation import GPTGenerator
+
                 self.external_generator = GPTGenerator()
+                logger.info("External LLM (OpenAI) initialized")
             except Exception as e:
+                logger.warning(f"Could not initialize external generator: {e}")
                 print(f"[Hybrid] Could not initialize external generator: {e}")
     
     def generate(self, prompt: str, **kwargs) -> str:
-        """Generate using preferred method with fallback."""
+        """
+        Generate using preferred method with fallback.
+
+        Args:
+            prompt: Text prompt for generation
+            **kwargs: Additional arguments passed to generator
+
+        Returns:
+            Generated text
+
+        Raises:
+            GPTGenerationError: If all generators fail
+        """
         # Try local first if preferred and available
         if self.prefer_local and self.local_generator:
             try:
+                logger.info("Using local LLM for generation")
                 return self.local_generator.generate(prompt, **kwargs)
             except Exception as e:
+                logger.warning(f"Local generation failed, trying external: {e}")
                 print(f"[Hybrid] Local generation failed, trying external: {e}")
-        
+
         # Fall back to external
         if self.external_generator:
+            logger.info("Using external LLM (OpenAI) for generation")
             return self.external_generator.generate(prompt, **kwargs)
-        
-        raise GPTGenerationError("No working generators available")
+
+        error_msg = "No working generators available"
+        logger.error(error_msg)
+        raise GPTGenerationError(error_msg)

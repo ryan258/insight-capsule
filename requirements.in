@@ -1,7 +1,15 @@
-openai
-python-dotenv
-requests
-whisper
-beautifulsoup4
-jinja2
-fpdf
+# Core AI/ML
+openai>=1.80.0
+openai-whisper>=20231117
+numpy<2  # Required for whisper compatibility
+
+# Audio Processing
+sounddevice>=0.4.6
+soundfile>=0.12.1
+
+# Text-to-Speech
+pyttsx3>=2.90
+
+# HTTP & Configuration
+requests>=2.32.3
+python-dotenv>=1.1.0
