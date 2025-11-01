@@ -22,6 +22,11 @@ AUDIO_SAMPLE_RATE = 44100
 AUDIO_CHANNELS = 1
 AUDIO_FILENAME = "latest.wav"
 
+# Silence detection settings (optional)
+SILENCE_DETECTION_ENABLED = os.getenv("SILENCE_DETECTION_ENABLED", "false").lower() == "true"
+SILENCE_THRESHOLD = float(os.getenv("SILENCE_THRESHOLD", "0.01"))  # Amplitude threshold for silence
+SILENCE_DURATION = float(os.getenv("SILENCE_DURATION", "3.0"))  # Seconds of silence before auto-stop
+
 # API settings
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 

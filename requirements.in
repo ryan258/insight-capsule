@@ -10,6 +10,17 @@ soundfile>=0.12.1
 # Text-to-Speech
 pyttsx3>=2.90
 
+# System Tray
+pystray>=0.19.5
+pillow>=10.0.0
+
+# Global Hotkeys (for Phase 2)
+pynput>=1.7.7
+
+# Vector Database (for Phase 4)
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
 # HTTP & Configuration
 requests>=2.32.3
 python-dotenv>=1.1.0
