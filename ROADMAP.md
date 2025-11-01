@@ -1,193 +1,121 @@
-# 🛣️ Insight Capsule — Project Roadmap (UPDATED)
+# **🧠 Insight Capsule: The Full Project Roadmap**
 
-> **New Mission**: Build a truly local-first, voice-activated pipeline for generating thoughtful insights with zero external dependencies and maximum accessibility.
+**Mission:** To create a zero-friction, voice-first "thought partner" that moves with you. It captures, synthesizes, and retrieves your ideas locally, helping you turn passing thoughts into evergreen content for your creative work.
 
----
+This document outlines the entire project journey, from the initial prototype to the ideal "happy path" we are now working towards.
 
-## ✅ Phase 1: Core Prototype (COMPLETED)
+## **✅ Completed Milestones (The Story So Far)**
 
-- [x] ✅ Local Python project setup with virtualenv
-- [x] ✅ Voice recording until Enter is pressed
-- [x] ✅ Whisper transcription (local)
-- [x] ✅ GPT-based creative brief generation
-- [x] ✅ GPT-based insight capsule generation
-- [x] ✅ Save logs + index logs
-- [x] ✅ Basic TTS fallback (ffplay beep, edge-tts, gTTS attempts)
+We have successfully built the core foundation of the application, proving the concept and solving the hardest technical challenges.
 
----
+* **Phase 1: Core Prototype (COMPLETED)**  
+  * Established the initial Python project, voice recording, and Whisper transcription.  
+* **Phase 2: Stabilization & Reliability (COMPLETED)**  
+  * Replaced unstable components, fixed async/sync conflicts, and implemented a reliable pyttsx3 TTS fallback system.  
+* **Phase 3: Usability Upgrades (COMPLETED)**  
+  * Added clear TTS progress indicators between pipeline steps and built an advanced cli.py entry point.  
+* **Phase 4: Modularity & Agent Architecture (COMPLETED)**  
+  * Refactored the entire project into a clean, modular architecture with core/, agents/, and pipeline/ separation.  
+* **Phase 5: Local-First Revolution (COMPLETED)**  
+  * Successfully pivoted the project to be **local-first**. This involved:  
+    * Building the LocalGenerator and HybridGenerator to use Ollama \[cite: core/local\_generation.py\].  
+    * Removing the dependency on external (OpenAI) APIs for the default workflow.  
+    * **Simplifying the pipeline** by removing the "creative brief" step, moving to a direct transcript \-\> insight workflow \[cite: pipeline/orchestrator.py\].  
+* **Phase 6: Technical Debt & Cleanup (COMPLETED)**  
+  * Removed legacy scripts and consolidated the project to a single, clean pipeline, making it ready for future development.
 
-## ✅ Phase 2: Stabilization & Reliability Pass (COMPLETED)
+## **🚀 The Path Forward (The "Happy Path" Plan)**
 
-- [x] ✅ **Replaced edge-tts with working pyttsx3 TTS** with proper cross-platform fallbacks
-- [x] ✅ **Fixed async/sync conflicts** - clean separation of sync operations
-- [x] ✅ **Replaced "print & hang" flows** with graceful error handling and user feedback
-- [x] ✅ **Added "Safe Mode" via TTS_ENABLED config** - disables TTS entirely if needed
-- [x] ✅ **Ensured TTS speaks actual content** with proper blocking and error recovery
-- [x] ✅ **Comprehensive exception handling** with custom exception types
-- [x] ✅ **Environment validation system** to catch issues before they break workflow
+With a stable, local-first foundation, we can now focus on the "ideal" user experience, moving from a CLI tool to a true "thought partner."
 
----
+### **Phase 1: The "App-ification" — From CLI to Tray**
 
-## ✅ Phase 3: Usability Upgrades (COMPLETED)
+**Goal:** Move the tool from a script you *run* to an application that's *always available* in your system tray (menu bar on Mac, tray on Windows). This is the foundation for all future "ambient" features.
 
-- [x] ✅ **Added clear progress indicators** between pipeline steps with TTS feedback
-- [x] ✅ **Clean log filenames** with automatic slugification of titles
-- [x] ✅ **Advanced CLI interface** with options for audio files, TTS control, model selection
-- [x] ✅ **Multiple entry points** (simple main.py, advanced cli.py, legacy record_and_run.py)
+**Why:** To remove the first major point of friction: having to open a terminal. This makes capturing an idea as simple as clicking an icon.
 
----
+**Key Tasks:**
 
-## ✅ Phase 4: Modularity & Agent Architecture (COMPLETED)
+* \[ \] **Refactor InsightPipeline:** Turn the orchestrator \[cite: pipeline/orchestrator.py\] into a long-running service or class that can be triggered on demand.  
+* \[ \] **Build Tray Icon:** Use a library like pystray (cross-platform) to create a persistent icon in the system tray.  
+* \[ \] **Add Basic Controls:** The tray icon's menu should have, at minimum:  
+  * "Start Recording" (triggers the audio recording \[cite: core/audio.py\])  
+  * "Stop Recording"  
+  * "Open Logs Folder" (opens the data/logs directory \[cite: core/storage.py\])  
+  * "Quit"  
+* \[ \] **Launch on Startup:** Add a preference (and code) to make the app launch when the computer starts.
 
-- [x] ✅ **Full modular architecture** with core/, agents/, pipeline/, config/ separation
-- [x] ✅ **Agent: ClarifierAgent** — parse + reframe rough ideas into structured briefs (Now removed due to workflow simplification)
-- [x] ✅ **Agent: SynthesizerAgent** — generate concise insight capsules
-- [x] ✅ **Agent: StorageManager** — handle file organization and indexing
-- [x] ✅ **Agent: AudioRecorder** — manage voice recording with real-time feedback
-- [x] ✅ **Agent: GPTGenerator** — handle all AI operations with role-based models
-- [x] ✅ **Agent: TextToSpeech** — manage speech output with intelligent fallbacks
-- [x] ✅ **Agent: Transcriber** — handle Whisper integration with lazy loading
+**Success Metric:** You can capture a full insight (record, transcribe, synthesize, save) without ever opening a terminal.
 
----
+### **Phase 2: Frictionless Capture — The Global Hotkey**
 
-## 🔄 Phase 5: Local-First Revolution (IN PROGRESS)
+**Goal:** Implement a global hotkey (e.g., Ctrl+Shift+Space) to start/stop recording from *any* application.
 
-> **PRIORITY SHIFT**: Eliminate external dependencies and achieve true offline capability
+**Why:** This removes the *final* piece of physical friction. You no longer have to stop what you're doing, find the tray icon, and click. You can capture a thought while you're in the middle of writing or browsing, making it truly "ambient."
 
-### 🏠 Local LLM Integration (IN PROGRESS)
+**Key Tasks:**
 
-- [x] ✅ **LocalGenerator class** with Ollama integration
-- [x] ✅ **HybridGenerator** for seamless local/external fallback
-- [x] ✅ **Pipeline integration** with local model support
-- [x] ✅ **CLI flags** for choosing local vs external models
-- [ ] 🔧 **Model optimization** for specific insight generation tasks
-- [ ] 🔧 **Local model caching** and startup optimization
-- [ ] 🔧 **Custom prompts** tuned for local models (simpler, more direct)
+* \[ \] **Implement Hotkey Listener:** Use a library like keyboard or pynput to listen for a global hotkey combination.  
+* \[ \] **Connect Hotkey to Pipeline:** Wire the hotkey to the "Start/Stop Recording" function from Phase 1\.  
+* \[ \] **Refine Audio Feedback:** Ensure the TTS feedback ("Recording started," "Processing...") \[cite: core/tts.py\] is crisp and immediate, as you won't have visual confirmation from a terminal.  
+* \[ \] **(Optional) Silence Detection:** Upgrade the audio recorder to *optionally* stop recording automatically after 5-10 seconds of silence.
 
-### 🎯 Workflow Simplification (IN PROGRESS)
+**Success Metric:** You can be typing an email, have a thought, press the hotkey, speak your mind, press it again, and continue your email, knowing the idea is captured.
 
-- [x] ✅ **Remove creative brief step** - go directly from transcript to insight
-- [x] ✅ **Focus on core value**: voice → clean transcription → meaningful summary → organized storage (Achieved by removing brief)
-- [ ] 🎯 **Streamline agent interactions** - reduce complexity without losing modularity (Partially addressed by removing ClarifierAgent. Further review might be needed for SynthesizerAgent's directness.)
-- [ ] 🎯 **Accessibility testing** with actual users who have mobility constraints
+### **Phase 3: The "Closed Loop" — From Insight to Draft**
 
-### 🔒 Privacy & Offline
+**Goal:** Connect your captured insights directly to your primary content creation workflow for ryanleej.com.
 
-- [ ] 🔒 **Complete offline mode** validation and testing
-- [ ] 🔒 **Data retention controls** - user decides what gets saved and where
-- [ ] 🔒 **Export capabilities** without external services
-- [ ] 🔒 **Remove all external API dependencies** from default workflow
+**Why:** This is the *payoff*. The tool stops being just a *library* and becomes an *active assistant*. It helps you battle the "blank page" by turning your raw, spoken ideas (like your MS journey insights) into structured outlines and first drafts for your evergreen guides.
 
----
+**Key Tasks:**
 
-## 🧹 Phase 6: Technical Debt & Cleanup (IN PROGRESS)
+* \[ \] **Create a "Drafting" Agent:** Build a new function (similar to your Synthesizer \[cite: agents/synthesizer.py\]) that uses the local LLM.  
+* \[ \] **Define New Prompts:** This agent will take a *capsule* as input and follow a new prompt, such as:  
+  * "You are a content strategist. Turn the following insight into a 5-point blog post outline."  
+  * "Create a 'first draft' of 3 paragraphs based on this idea, intended for an evergreen guide."  
+* \[ \] **Add "Actions" Menu:** Add a new "Actions" submenu to your tray icon. When you complete an insight, it could ask:  
+  * "What's next?"  
+    * "Draft Blog Outline"  
+    * "Export to Markdown"  
+* \[ \] **Improve Log Format:** Save these new drafts alongside the original transcript and capsule in the log file \[cite: core/storage.py\].
 
-> Clean up the codebase and remove legacy complexity
+**Success Metric:** You can go from a spoken thought to a blog post outline in under 60 seconds, all within the same tool.
 
-### 🗑️ Legacy Removal
+### **Phase 4: The Insight Library — Your Personal Search Engine**
 
-- [x] 🗑️ **Remove record_and_run.py** - consolidate to single pipeline approach
-- [x] 🗑️ **Remove utils/gpt_interface.py** and **utils/whisper_wrapper.py** - superseded by core modules
-- [x] 🗑️ **Remove agents/clarifier_agent.py** - duplicate of agents/clarifier.py
-- [x] 🗑️ **Clean up test files** - integrate into proper test suite (Initial cleanup: moved to tests/ directory)
+**Goal:** Make your entire log history searchable using natural language.
 
-### 🧪 Testing & Quality
+**Why:** To find old ideas and connect concepts. Instead of just *storing* thoughts, you can *ask questions* of your past self (e.g., "What ideas did I have for my 'MS and fatigue' guide?").
 
-- [ ] 🧪 **Comprehensive test suite** for all core functionality
-- [ ] 🧪 **Integration tests** for full pipeline with local models
-- [ ] 🧪 **Performance benchmarking** of local vs external models
-- [ ] 🧪 **Memory usage optimization** for long-running sessions
+**Key Tasks:**
 
----
+* \[ \] **Local Vector DB:** Integrate a simple, file-based vector database (like LanceDB or ChromaDB).  
+* \[ \] **Embedding Generation:** When a new log is saved, create a background task that generates vector embeddings (using a local model) for the transcript and capsule.  
+* \[ \] **"Search" Interface:** Add a "Search My Thoughts..." command to the tray icon that opens a simple prompt.  
+* \[ \] **Search Pipeline:**  
+  1. User types a query ("ideas about diet").  
+  2. The query is embedded.  
+  3. You find the 5-10 most relevant log files from your vector DB.  
+  4. You feed those relevant texts to your local LLM with a prompt like: "Based on these past thoughts, answer the user's query: 'ideas about diet'."  
+  5. The LLM synthesizes an answer, and your TTS speaks it.
 
-## 🎨 Phase 7: User Experience Refinement (PLANNED)
+**Success Metric:** You can ask your app a question and get a synthesized answer based on *your own* past recordings, not the public internet.
 
-> Polish the experience for daily use by people with accessibility needs
+### **Phase 5: Distribution — The "One-Click" Install**
 
-### 🎙️ Audio Improvements
+**Goal:** Package the entire application so it can be installed by a non-technical user (especially others who need an accessibility-first tool).
 
-- [ ] 🎙️ **Audio level visualization** during recording
-- [ ] 🎙️ **Configurable recording sensitivity** for different microphone setups
-- [ ] 🎙️ **Background noise filtering** for cleaner transcription
-- [ ] 🎙️ **Multiple audio format support** beyond WAV
+**Why:** This fulfills the highest goal of accessibility: making the tool available to *everyone* who needs it, not just developers.
 
-### 📝 Output Improvements
+**Key Tasks:**
 
-- [ ] 📝 **Configurable insight lengths** (short summaries vs detailed analysis)
-- [ ] 📝 **Multiple output formats** (plain text, markdown, structured notes)
-- [ ] 📝 **Smart tagging system** based on content analysis
-- [ ] 📝 **Search functionality** across historical insights
+* \[ \] **Package with PyInstaller:** Use a tool like PyInstaller or Nuitka to bundle your entire Python app and its dependencies into a single .exe (Windows) or .app (macOS) file.  
+* \[C\] **Create a Simple Installer:** Use Inno Setup (Windows) or create a .dmg (macOS) to make it user-friendly.  
+* \[ \] **The "Hard Part": Bundle Ollama:** The installer must:  
+  1. Check if Ollama is installed.  
+  2. If not, bundle and run the Ollama installer.  
+  3. Run the necessary command (ollama pull llama3.2) on the user's behalf.  
+  4. Set your app to launch at login.
 
-### ⌨️ Accessibility Features
-
-- [ ] ⌨️ **Voice commands** for basic control (start, stop, repeat, save)
-- [ ] ⌨️ **Configurable TTS voices** and speeds
-- [ ] ⌨️ **Large text mode** for visual output
-- [ ] ⌨️ **Keyboard shortcut alternatives** for all mouse actions
-
----
-
-## 📦 Phase 8: Distribution & Sharing (FUTURE)
-
-> Make it easy for others to use while maintaining local-first principles
-
-### 🚀 Packaging
-
-- [ ] 📦 **Simple installer** for non-technical users
-- [ ] 📦 **Docker containerization** for cross-platform consistency
-- [ ] 📦 **Portable executable** version (no Python installation required)
-- [ ] 📦 **Model bundling** options for completely offline distribution
-
-### 🔗 Export & Integration
-
-- [ ] 🔗 **Export to common note-taking apps** (Obsidian, Notion, Markdown files)
-- [ ] 🔗 **Email integration** for sharing insights
-- [ ] 🔗 **Calendar integration** for scheduled insight sessions
-- [ ] 🔗 **Backup and sync** options that respect privacy
-
----
-
-## 🎯 Current Priorities (Next 2-4 Weeks)
-
-1. **Complete local LLM integration** - ensure Ollama setup is smooth and reliable. Focus on model optimization, caching, and custom prompts.
-2. **Continue Workflow Simplification** - Focus on streamlining remaining agent interactions and prepare for accessibility testing.
-3. **Test with real users** - validate the accessibility value proposition (after current simplification).
-4. **Documentation update** - reflect the new local-first architecture and recent changes.
-
----
-
-## 🧯 Updated Pain Points & Solutions
-
-| Old Problem         | New Local-First Solution          | Status                         |
-| ------------------- | --------------------------------- | ------------------------------ |
-| OpenAI API costs    | Local LLM with Ollama             | ✅ Implemented                 |
-| Internet dependency | Fully offline pipeline            | 🔄 In Progress                 |
-| Privacy concerns    | Zero external data sharing        | 🔄 In Progress                 |
-| Complex workflow    | Simplified voice→insight→storage  | ✅ Implemented (brief removed) |
-| Over-engineering    | Focus on core accessibility value | 🔄 In Progress                 |
-
----
-
-## 🎯 Refined Mission Statement
-
-**Enable voice-first, hands-free creative workflows for users with limited physical control, using entirely local processing to ensure privacy, reliability, and zero ongoing costs.**
-
-**Core Values:**
-
-- **Local-first**: No internet required after initial setup
-- **Accessibility-focused**: Designed for users with mobility constraints
-- **Privacy-respecting**: Your thoughts stay on your computer
-- **Reliability**: Works when you need it, regardless of external services
-- **Simplicity**: Complex under the hood, simple to use
-
----
-
-## 🔚 Success Metrics
-
-- [ ] **Zero external API calls** in default operation mode
-- [ ] **Sub-10 second** end-to-end processing time for typical voice notes
-- [ ] **Accessible to non-technical users** with simple installation
-- [ ] **Positive feedback** from users with accessibility needs
-- [ ] **Daily use viability** - stable enough for regular workflow integration
-
-**Status: Pivoting to true local-first architecture. Core mission clarified and focused. Legacy code cleanup significantly progressed. Workflow simplification (brief removal) completed.**
+**Success Metric:** You can give a single file to a friend, and they can install and use Insight Capsule without ever touching a terminal or knowing what Python or uv is.

@@ -1,272 +1,141 @@
-# 🧠 Insight Capsule
+# **🧠 Insight Capsule**
 
-**A local-first, privacy-focused voice-to-insight tool.**  
-Speak your thoughts → get them transcribed, organized, and synthesized → all on your computer.
+**A local-first, privacy-focused "thought partner" designed for accessibility.** Turn your rambling, spoken ideas into clear, synthesized insights—and then into first drafts for your content. All on your own computer.
 
----
+## **🎯 Why This Exists**
 
-## 🎯 Why This Exists
+If you have limited mobility, chronic pain, or just prefer voice-first workflows, Insight Capsule is being built to help you:
 
-If you have limited mobility, chronic pain, or just prefer voice-first workflows, Insight Capsule lets you:
+* **Capture ideas hands-free** \- A global hotkey or tray icon means you never leave your flow.  
+* **Get organized summaries** \- Turn rambling thoughts into clear, high-insight capsules.  
+* **Go from thought to draft** \- Use your insights to generate blog post outlines and first drafts, battling the "blank page."  
+* **Keep everything private** \- No data ever leaves your computer. Your thoughts stay yours.  
+* **Work offline** \- No internet required after setup. No API keys, no cloud services, no ongoing costs.
 
-- **Capture ideas hands-free** - just speak naturally
-- **Get organized summaries** - turn rambling thoughts into clear insights  
-- **Keep everything private** - no data leaves your computer
-- **Work offline** - no internet required after setup
-- **Save and search** - automatic organization and indexing
+This project is built from the ground up to be an **accessibility-first** tool for creators.
 
-Built specifically for **accessibility** and **privacy**. Your thoughts stay yours.
+## **✨ The Vision (How It's Designed to Work)**
 
----
+This project is moving from a command-line tool to a zero-friction, ambient application.
 
-## ✨ How It Works
+1. **🎙️ Speak (Anytime)** \- While writing an email or browsing the web, you have a thought. You press a global hotkey (e.g., Ctrl+Shift+Space).  
+2. **🗣️ Feedback** \- You hear a "Recording started" confirmation$$cite: \`core/tts.py\`$$  
+   . You speak your idea naturally. You press the hotkey again.  
+3. **🧠 Process (In Background)** \- In the background, your voice is transcribed$$cite: \`core/transcription.py\`$$  
+   , and a local LLM synthesizes a concise "insight capsule"$$cite: \`agents/synthesizer.py\`$$  
+   .  
+4. **🔊 Hear** \- A few seconds later, the TTS reads your new insight back to you.  
+5. **✍️ Act (Optional)** \- A menu in your system tray asks, "What's next?" You select "Draft Blog Outline," and a new draft is added to your log, ready for your evergreen content.  
+6. **💾 Save** \- The transcript, insight, and new draft are all saved locally in an organized Markdown file$$cite: \`core/storage.py\`$$  
+   .
 
-1. **🎙️ Speak** - Press Enter, talk naturally, Press Enter again
-2. **📝 Transcribe** - Whisper converts speech to text (locally)
-3. **🧠 Synthesize** - Local AI creates a clear, insightful summary
-4. **🔊 Hear** - Text-to-speech reads your insight back to you
-5. **💾 Save** - Everything automatically organized and searchable
+## **🚀 Project Status & Roadmap**
 
-**No API keys. No cloud services. No ongoing costs.**
+This project has a stable, local-first foundation and is now being developed into a full application.
 
----
+* **✅ COMPLETED:** Core CLI tool, local Whisper transcription, local LLM (Ollama) integration$$cite: \`core/local\_generation.py\`$$  
+  , and a stable pipeline.  
+* **🚀 IN PROGRESS:** See our full [**ROADMAP.md**](https://www.google.com/search?q=ROADMAP.md) for the "happy path" plan, which includes:  
+  * **Phase 1: Tray App** \- Moving from a CLI to an always-on tray application.  
+  * **Phase 2: Global Hotkey** \- For true, frictionless "ambient" capture.  
+  * **Phase 3: Content Drafting** \- The "closed loop" for turning ideas into outlines.  
+  * **Phase 4: Personal Search** \- A natural language search for all your past insights.  
+  * **Phase 5: One-Click Install** \- A distributable app for non-technical users.
 
-## 🚀 Quick Start
+## **🛠️ Developer Quick Start (Current Version)**
 
-### Prerequisites
-- **Python 3.10+** 
-- **Microphone** (built-in or USB)
-- **5GB free space** (for local AI model)
+While we build the full app, you can use the stable CLI version today.
 
-### Installation
+### **Prerequisites**
 
-```bash
-# 1. Clone and setup
-git clone https://github.com/your-name/insight-capsule.git
+* **Python 3.10+**  
+* **Microphone**  
+* [**uv**](https://astral.sh/uv) (or pip and venv)  
+* [**Ollama**](https://ollama.ai) (Install and run: ollama pull llama3.2)  
+* **ffmpeg** (brew install ffmpeg or choco install ffmpeg)
+
+### **Installation & Running**
+
+\# 1\. Clone the repo  
+git clone \[https://github.com/ryan258/insight-capsule.git\](https://github.com/ryan258/insight-capsule.git)  
 cd insight-capsule
-python -m venv .venv
 
-# Windows:
-.venv\Scripts\activate
+\# 2\. Create environment and install packages (using uv)  
+uv venv  
+uv pip install \-r requirements.txt
 
-# macOS/Linux:
-source .venv/bin/activate
+\# 3\. Run the main pipeline\!  
+\# This uses the default "press Enter to record" flow  
+uv run python main.py
 
-# 2. Install Python dependencies
-pip install -r requirements.txt
+\# 4\. (Optional) Run with advanced CLI options  
+uv run python cli.py \--help
 
-# 3. Install Ollama (local AI)
-# Go to https://ollama.ai and install for your OS
-# Then pull a model:
-ollama pull llama3.2
+### **Environment Configuration**
 
-# 4. Optional: Install ffmpeg for better audio
-# Windows: choco install ffmpeg
-# macOS: brew install ffmpeg  
-# Ubuntu: sudo apt-get install ffmpeg
-```
+Create .env file for optional settings:
 
-### First Run
+\# Optional \- only needed if using \--external-llm  
+OPENAI\_API\_KEY=your\_key\_here
 
-```bash
-# Simple mode - just run it
-python main.py
+\# Optional tweaks  
+TTS\_ENABLED=true  
+WHISPER\_MODEL=base  
+TTS\_RATE=170  
+USE\_LOCAL\_LLM=true  
+LOCAL\_LLM\_MODEL=llama3.2
 
-# Or with options
-python cli.py --help
-```
+## **📁 What Gets Saved**
 
-That's it! No API keys, no configuration files, no accounts.
+Everything goes in the data/ folder. This is **your** private database.
 
----
+data/  
+├── input\_voice/     \# Your raw audio recordings (.wav)  
+└── logs/           \# Full session logs  
+    ├── index.md    \# A searchable index of all your insights  
+    └── 2025-11-01-123000-my-new-idea.md
 
-## 🎛️ Usage Options
+*Note: The briefs/ directory has been removed as part of our pipeline simplification.*
 
-### Simple Mode
-```bash
-python main.py
-```
-Uses all defaults: local AI, built-in microphone, automatic saving.
+**Example log entry (.md):**
 
-### Advanced Mode
-```bash
-# Use a pre-recorded audio file
-python cli.py --audio path/to/recording.wav
+\# Insight Capsule Log — 2025-11-01 12:30:00  
+\*\*Title:\*\* My New Idea  
+\*\*Tags:\*\* \#website \#ms
 
-# Disable text-to-speech
-python cli.py --no-tts
+\*\*Transcript:\*\*  
+\> I was thinking about maybe building a small tool for...
 
-# Use different Whisper model (faster but less accurate)
-python cli.py --whisper-model tiny
+\*\*Insight Capsule:\*\*  
+This idea centers on creating a focused development...
 
-# Fall back to OpenAI (requires OPENAI_API_KEY in .env)
-python cli.py --external-llm
-```
+\*\*Generated Draft: (Blog Post Outline)\*\*  
+1\.  Introduction: The challenge of...  
+2\.  ...
 
-### Environment Configuration
-Create `.env` file for optional settings:
-```env
-# Optional - only needed if using --external-llm
-OPENAI_API_KEY=your_key_here
+## **🔧 Troubleshooting**
 
-# Optional tweaks
-TTS_ENABLED=true
-WHISPER_MODEL=base
-TTS_RATE=170
-USE_LOCAL_LLM=true
-LOCAL_LLM_MODEL=llama3.2
-```
+### **"No local LLM available"**
 
----
+Make sure the Ollama application is running on your desktop. You can test it by running ollama pull llama3.2 in your terminal.
 
-## 📁 What Gets Saved
+### **TTS not working**
 
-Everything goes in the `data/` folder:
+pyttsx3 can be finicky.
 
-```
-data/
-├── input_voice/     # Your audio recordings
-├── logs/           # Full session logs with timestamps
-│   └── index.md    # Searchable index of all insights
-└── briefs/         # Structured data (JSON format)
-```
+1. Make sure your speakers are on and not muted.  
+2. Run the minimal test: uv run python tests/test\_tts\_minimal.py  
+3. If all else fails, you can disable it in your .env file with TTS\_ENABLED=false or by running uv run python cli.py \--no-tts.
 
-**Example log entry:**
-```markdown
-# Insight Capsule Log — 2024-01-15 14:30:22
-**Title:** Weekend Project Ideas
-**Tags:** #coding #weekend
-
-**Transcript:** I was thinking about maybe building a small tool for...
-
-**Insight Capsule:** This idea centers on creating a focused development...
-```
-
----
-
-## 🔧 Troubleshooting
-
-### "No local LLM available"
-```bash
-# Install Ollama from ollama.ai, then:
-ollama pull llama3.2
-ollama serve  # Should start automatically but try this if issues
-```
-
-### Audio issues
-```bash
-# Test your microphone
-python -c "import sounddevice as sd; print(sd.query_devices())"
-
-# Try different Whisper model
-python cli.py --whisper-model small
-```
-
-### TTS not working
-```bash
-# Test TTS separately
-python -c "import pyttsx3; e=pyttsx3.init(); e.say('test'); e.runAndWait()"
-
-# Disable if problematic
-python cli.py --no-tts
-```
-
-### Performance issues
-```bash
-# Use faster models
-python cli.py --whisper-model tiny
-
-# Or in .env:
-LOCAL_LLM_MODEL=mistral  # Smaller than llama3.2
-```
-
----
-
-## 🏗️ Architecture
-
-**Local-first design:** Everything runs on your computer.
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   🎙️ Audio      │───▶│   📝 Whisper     │───▶│  🧠 Local LLM   │
-│   Recording     │    │   Transcription  │    │  (Ollama)       │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                                         │
-┌─────────────────┐    ┌──────────────────┐             │
-│  🔊 Text-to-    │◀───│   💾 Storage     │◀────────────┘
-│  Speech         │    │   & Indexing     │
-└─────────────────┘    └──────────────────┘
-```
-
-**Core modules:**
-- `core/` - Audio, transcription, local AI, storage
-- `agents/` - Specialized AI behaviors (clarify, synthesize)  
-- `pipeline/` - Orchestrates the full workflow
-- `config/` - Settings and environment handling
-
----
-
-## 🆚 Why Local Instead of Cloud?
-
-| Cloud Services | Insight Capsule |
-|----------------|-----------------|
-| 💰 Monthly fees | ✅ Free after setup |
-| 🌐 Internet required | ✅ Works offline |
-| 🔍 Data collection | ✅ Private by design |
-| ⏰ API rate limits | ✅ No limits |
-| 🔒 Terms of service | ✅ You own everything |
-| 📡 Latency | ✅ Instant processing |
-
----
-
-## 🧩 Extend & Customize
-
-**Simple customization:**
-- Edit prompts in `agents/clarifier.py` and `agents/synthesizer.py`
-- Adjust model settings in `config/settings.py`
-- Modify TTS voice/speed in the TTS settings
-
-**Advanced:**
-- Add new agents for different processing styles
-- Connect to different local LLM backends
-- Export to your preferred note-taking system
-- Build custom workflows in `pipeline/orchestrator.py`
-
----
-
-## 🤝 Contributing
-
-This project prioritizes **accessibility** and **privacy**. Contributions welcome that:
-
-- Improve accessibility for users with limited mobility
-- Enhance local processing capabilities  
-- Reduce complexity while maintaining functionality
-- Add better error handling and user feedback
-
----
-
-## 💙 Accessibility Statement
+## **💙 Accessibility Statement**
 
 **This tool was built specifically for creators with physical limitations.**
 
 If traditional input methods are challenging for you, this project aims to provide:
-- ✅ Voice-first interaction requiring minimal typing
-- ✅ Intelligent error handling that doesn't break your flow
-- ✅ Multiple interface options (simple, advanced, legacy)
-- ✅ Graceful fallbacks when components fail
-- ✅ Clear audio feedback throughout the process
-- ✅ No external dependencies that might fail unexpectedly
+
+* ✅ Voice-first interaction requiring minimal typing  
+* ✅ Intelligent error handling that doesn't break your flow  
+* ✅ Clear audio feedback throughout the process  
+* ✅ A local-first design that works offline and respects your privacy
 
 **If you're building something creative while working with constraints, this is for you.**
-
----
-
-## 📄 License
-
-MIT License - use, modify, distribute, improve.
-
----
-
-**Philosophy:** You shouldn't have to fight technology just to capture a thought. Your ideas deserve better tools, and your privacy deserves respect.
-
-*Local-first. Privacy-focused. Built for accessibility.*
