@@ -14,4 +14,4 @@ data/input_voice/*
 *.log
 .coverage
 htmlcov/
-.pytest_cache/
+.pytest_cache/data/vectorstore/

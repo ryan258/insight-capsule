@@ -1,7 +1,7 @@
 # core/local_generation.py
 import requests
-import json
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
+from config.settings import LOCAL_LLM_URL, LOCAL_LLM_MODEL
 from core.exceptions import GPTGenerationError
 from core.logger import setup_logger
 
@@ -13,7 +13,7 @@ RoleType = Literal["writing", "fact_check", "expander"]
 class LocalGenerator:
     """Local LLM generator using Ollama or other local inference."""
 
-    def __init__(self, base_url: str = "http://localhost:11434", model: str = "llama3.2"):
+    def __init__(self, base_url: str = LOCAL_LLM_URL, model: str = LOCAL_LLM_MODEL):
         """
         Initialize local LLM generator.
 
@@ -73,7 +73,7 @@ class LocalGenerator:
     def _call_ollama(self, prompt: str, system_prompt: str, temperature: float) -> str:
         """Call Ollama API directly."""
         url = f"{self.base_url}/api/generate"
-        
+
         payload = {
             "model": self.model,
             "prompt": f"{system_prompt}\n\nUser: {prompt}\nAssistant:",
@@ -82,12 +82,49 @@ class LocalGenerator:
                 "temperature": temperature
             }
         }
-        
-        response = self.session.post(url, json=payload, timeout=60)
+
+        response = self.session.post(url, json=payload, timeout=120)
+        if response.status_code == 404:
+            logger.info("Ollama /api/generate returned 404; retrying with /api/chat endpoint")
+            return self._call_ollama_chat(prompt, system_prompt, temperature)
         response.raise_for_status()
-        
+
         result = response.json()
-        return result.get("response", "")
+        return self._extract_response_text(result)
+
+    def _call_ollama_chat(self, prompt: str, system_prompt: str, temperature: float) -> str:
+        """Fallback to the chat endpoint if /api/generate is unavailable."""
+        url = f"{self.base_url}/api/chat"
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            "stream": False,
+            "options": {"temperature": temperature}
+        }
+        response = self.session.post(url, json=payload, timeout=120)
+        response.raise_for_status()
+        result = response.json()
+        return self._extract_response_text(result)
+
+    @staticmethod
+    def _extract_response_text(result: Union[dict, str]) -> str:
+        """Normalize Ollama response payloads into plain text."""
+        if isinstance(result, str):
+            return result
+        if not isinstance(result, dict):
+            return ""
+
+        if "response" in result:
+            return result.get("response", "")
+
+        message = result.get("message")
+        if isinstance(message, dict):
+            return message.get("content", "")
+
+        return ""
     
     def _get_system_prompt_for_role(self, role: RoleType) -> str:
         """Get role-specific system prompts."""
@@ -102,9 +139,24 @@ class LocalGenerator:
         """Check if the local LLM service is available."""
         try:
             response = self.session.get(f"{self.base_url}/api/tags", timeout=5)
-            is_up = response.status_code == 200
-            logger.debug(f"Ollama availability check: {is_up}")
-            return is_up
+            if response.status_code != 200:
+                logger.debug("Ollama availability check failed with status %s", response.status_code)
+                return False
+
+            tags = response.json().get("models", [])
+            if not any(
+                self.model == tag.get("name") or self.model == tag.get("model")
+                for tag in tags
+            ):
+                logger.warning(
+                    "Local LLM model '%s' is not present. Run 'ollama pull %s' or adjust LOCAL_LLM_MODEL.",
+                    self.model,
+                    self.model,
+                )
+                return False
+
+            logger.debug("Ollama availability check succeeded and model '%s' is present", self.model)
+            return True
         except Exception as e:
             logger.debug(f"Ollama not available: {e}")
             return False

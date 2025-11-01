@@ -20,6 +20,7 @@ for dir_path in [AUDIO_DIR, LOGS_DIR]:
 # Audio settings
 AUDIO_SAMPLE_RATE = 44100
 AUDIO_CHANNELS = 1
+AUDIO_INPUT_DEVICE = os.getenv("AUDIO_INPUT_DEVICE")
 AUDIO_FILENAME = "latest.wav"
 
 # Silence detection settings (optional)

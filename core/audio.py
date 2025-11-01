@@ -2,13 +2,14 @@ import queue
 import sounddevice as sd
 import soundfile as sf
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 import threading
 import time
 import numpy as np
 from config.settings import (
     AUDIO_SAMPLE_RATE,
     AUDIO_CHANNELS,
+    AUDIO_INPUT_DEVICE,
     SILENCE_DETECTION_ENABLED,
     SILENCE_THRESHOLD,
     SILENCE_DURATION
@@ -25,12 +26,14 @@ class AudioRecorder:
         sample_rate: int = AUDIO_SAMPLE_RATE,
         channels: int = AUDIO_CHANNELS,
         silence_detection: bool = SILENCE_DETECTION_ENABLED,
+        input_device: Optional[str] = AUDIO_INPUT_DEVICE,
         silence_threshold: float = SILENCE_THRESHOLD,
         silence_duration: float = SILENCE_DURATION
     ):
         self.sample_rate = sample_rate
         self.channels = channels
         self.queue = queue.Queue()
+        self._input_device_config = input_device.strip() if input_device else None
 
         # Silence detection settings
         self.silence_detection = silence_detection
@@ -149,6 +152,91 @@ class AudioRecorder:
         while not self.queue.empty():
             self.queue.get()
 
+    def _open_stream(self, device: Optional[Union[int, str]] = None) -> sd.InputStream:
+        """Create an InputStream with optional device override."""
+        stream_kwargs = {
+            "samplerate": self.sample_rate,
+            "channels": self.channels,
+            "callback": self._audio_callback
+        }
+        if device is not None:
+            stream_kwargs["device"] = device
+        return sd.InputStream(**stream_kwargs)
+
+    def _get_configured_device(self) -> Optional[Union[int, str]]:
+        """Resolve configured input device name/index if provided."""
+        if not self._input_device_config:
+            return None
+
+        config_value = self._input_device_config
+
+        # Allow direct index specification
+        try:
+            return int(config_value)
+        except ValueError:
+            pass
+
+        # Match by substring against available device names
+        try:
+            devices = sd.query_devices()
+        except Exception as exc:
+            logger.warning(
+                "Could not query audio devices to match configured input '%s': %s",
+                config_value,
+                exc,
+            )
+            return config_value
+
+        for idx, dev in enumerate(devices):
+            name = dev.get("name", "")
+            if config_value.lower() in name.lower():
+                logger.info("Matched configured audio input '%s' to device %s (%s)",
+                            config_value, idx, name)
+                return idx
+
+        logger.warning(
+            "Configured audio input '%s' not found; falling back to default device",
+            config_value,
+        )
+        return None
+
+    def _find_fallback_device(self, exclude: Optional[Union[int, str]] = None) -> Optional[int]:
+        """Find the first available input device, excluding the provided one."""
+        try:
+            devices = sd.query_devices()
+        except Exception as exc:
+            logger.warning("Could not query audio devices for fallback: %s", exc)
+            return None
+
+        for idx, dev in enumerate(devices):
+            if dev.get("max_input_channels", 0) > 0 and idx != exclude:
+                return idx
+        return None
+
+    def _log_input_devices(self) -> None:
+        """Log available input devices for troubleshooting."""
+        try:
+            devices = sd.query_devices()
+        except Exception as exc:
+            logger.error("Unable to list audio devices: %s", exc)
+            return
+
+        input_devices = [
+            f"{idx}: {dev.get('name', 'Unknown')} "
+            f"(inputs={dev.get('max_input_channels', 0)}, "
+            f"default_sr={dev.get('default_samplerate', 'n/a')})"
+            for idx, dev in enumerate(devices)
+            if dev.get("max_input_channels", 0) > 0
+        ]
+
+        if not input_devices:
+            logger.error("PortAudio did not report any usable input devices")
+            return
+
+        logger.info("Detected audio input devices:")
+        for entry in input_devices:
+            logger.info("  %s", entry)
+
     # === New methods for non-blocking recording ===
 
     def start_recording(self) -> bool:
@@ -165,18 +253,45 @@ class AudioRecorder:
                 logger.info("Starting non-blocking recording")
                 self.clear_queue()
 
-                self._stream = sd.InputStream(
-                    samplerate=self.sample_rate,
-                    channels=self.channels,
-                    callback=self._audio_callback
-                )
-                self._stream.start()
-                self._is_recording = True
-                logger.info("Recording started successfully")
-                return True
+                device = self._get_configured_device()
+                try:
+                    self._stream = self._open_stream(device=device)
+                    self._stream.start()
+                    self._is_recording = True
+                    logger.info(
+                        "Recording started successfully%s",
+                        f" using device {device}" if device is not None else ""
+                    )
+                    return True
+
+                except sd.PortAudioError as err:
+                    logger.error(
+                        "Failed to open audio stream%s: %s",
+                        f" with device {device}" if device is not None else "",
+                        err,
+                        exc_info=True,
+                    )
+                    fallback_device = self._find_fallback_device(exclude=device)
+                    if fallback_device is not None:
+                        try:
+                            logger.info("Retrying audio stream with fallback device %s", fallback_device)
+                            self._stream = self._open_stream(device=fallback_device)
+                            self._stream.start()
+                            self._is_recording = True
+                            logger.info("Recording started successfully using fallback device %s", fallback_device)
+                            return True
+                        except sd.PortAudioError as fallback_err:
+                            logger.error(
+                                "Fallback audio device %s also failed: %s",
+                                fallback_device,
+                                fallback_err,
+                                exc_info=True,
+                            )
+                    self._log_input_devices()
+                    raise
 
             except Exception as e:
-                logger.error(f"Failed to start recording: {e}", exc_info=True)
+                logger.error("Failed to start recording: %s", e, exc_info=True)
                 self._is_recording = False
                 return False
 
